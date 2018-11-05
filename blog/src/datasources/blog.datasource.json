@@ -1,0 +1,6 @@
+{
+  "name": "blog",
+  "connector": "memory",
+  "localStorage": "blog",
+  "file": ""
+}
