@@ -18,7 +18,7 @@ import {
 import {Category, Post} from '../models';
 import {CategoryRepository} from '../repositories';
 
-export class CategoryPostsControllerController {
+export class CategoryPostsController{
   constructor(
     @repository(CategoryRepository)
     public categoryRepository : CategoryRepository,
