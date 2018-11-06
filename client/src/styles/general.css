@@ -1,0 +1,58 @@
+html, body, #app {
+    height: 100%;
+}
+body {
+    margin: 0;
+    padding: 0px 8px;
+}
+#app {
+}
+
+#model-wrapper {
+    padding: 20px;
+}
+
+.new-post-form-wrapper, .edit-post-form-wrapper {
+    padding: 20px 0;
+    text-align: center;
+}
+
+.model-list-wrapper {
+    padding: 20px 0;
+}
+
+.rml-paragraph {
+    margin-bottom: 0;
+}
+.no-margin {
+    margin: 0!important;
+}
+
+.code-section-wrapper {
+    padding: 20px;
+}
+
+.code-section-internal-wrapper {
+    display: flex;
+    width: 100%;
+}
+.code-section-menu-wrapper {
+    width: 20%;
+}
+.code-section-code-wrapper {
+    margin: 0 auto;
+}
+
+@media (max-width: 770px){
+    .code-section-wrapper {
+        display: block;
+        width: 100%;
+    }
+
+    .code-section-menu-wrapper {
+        width: 100%;
+    }
+    .code-section-code-wrapper {
+        width: 100%;
+    }
+}
