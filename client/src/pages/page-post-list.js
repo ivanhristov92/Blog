@@ -3,17 +3,19 @@ import { compose, pick, values } from "ramda";
 import { Value } from "slate";
 import ModelEntriesList from "../components/model-entries-list";
 import BlogPostModel from "../model-blog-post/model-blog-post";
-import { Link } from "react-router-dom";
-import Button from "@material-ui/core/Button/Button";
 import EditBlogPostForm from "../components/edit-post-form";
 import connect from "react-redux/es/connect/connect";
 import { bindActionCreators } from "redux";
 import Plain from "slate-plain-serializer";
+import { html } from "../components/rich-text/serializers";
+
+import Card from "../components/card";
 
 class _PostListPage extends React.Component {
   state = {
     selected: [],
-    openEdit: false
+    openEdit: false,
+    preview: false
   };
 
   componentDidUpdate(prevProps, prevState) {
@@ -60,6 +62,10 @@ class _PostListPage extends React.Component {
       )
     );
     console.log(data);
+
+    let dataForPreview = this.mapSelectedToEntries().map(obj => {
+      return html.serialize(Value.fromJSON(JSON.parse(obj.content)));
+    });
     return (
       <>
         <div id={"model-wrapper"}>
@@ -79,16 +85,15 @@ class _PostListPage extends React.Component {
               }
             }}
             onDeleteClick={this.onDelete}
+            createButtonLinksTo={"/posts/new"}
+            onPreviewClick={() => {
+              this.setState({
+                preview: !this.state.preview
+              });
+            }}
+            preview={this.state.preview}
           />
         </div>
-        <div className={"create-button-wrapper"}>
-          <Link to={`/posts/new`}>
-            <Button variant="contained" color="primary">
-              Create
-            </Button>
-          </Link>
-        </div>
-
         {this.state.openEdit && (
           <EditBlogPostForm
             entries={this.mapSelectedToEntries()}
@@ -106,6 +111,15 @@ class _PostListPage extends React.Component {
             }}
           />
         )}
+        {this.state.preview &&
+          this.state.selected.length === 1 && (
+            <div>
+              <Card
+                title={this.mapSelectedToEntries()[0].title}
+                content={dataForPreview}
+              />
+            </div>
+          )}
       </>
     );
   }

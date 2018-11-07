@@ -87,10 +87,17 @@ export default class EditBlogPostForm extends React.Component {
       <div className="new-post-form-wrapper">
         <div className={"new-post-title-wrapper"}>
           <TextField
-            className={"new-post-title"}
-            placeholder={"Post Title"}
-            onChange={this.onTitleChange}
+            id="outlined-full-width"
+            label="Post Title"
             value={this.state.title}
+            onChange={this.onTitleChange}
+            placeholder={"Post Title"}
+            fullWidth
+            margin="normal"
+            variant="outlined"
+            InputLabelProps={{
+              shrink: true
+            }}
           />
         </div>
         <Paper>

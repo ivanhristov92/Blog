@@ -33,15 +33,29 @@ const rules = [
         switch (obj.type) {
           case "code":
             return (
-              <pre>
-                <code>{children}</code>
-              </pre>
+              <span>
+                <pre>
+                  <code>{children}</code>
+                </pre>
+              </span>
             );
           case "paragraph":
             return <p className={obj.data.get("className")}>{children}</p>;
+
           case "quote":
           case "block-quote":
-            return <blockquote>{children}</blockquote>;
+            return (
+              <span>
+                <blockquote>{children}</blockquote>
+              </span>
+            );
+
+          case "image":
+            return (
+              <img src={obj.data.get("src")} className={"post-content-image"} />
+            );
+          default:
+            return <span>{children}</span>;
         }
       }
     }
@@ -62,17 +76,29 @@ const rules = [
       if (obj.object == "mark") {
         switch (obj.type) {
           case "bold":
-            return <strong>{children}</strong>;
-          case "italic":
-            return <em>{children}</em>;
-          case "underline":
-            return <u>{children}</u>;
-          case "code":
             return (
-              <pre>
-                <code>{children}</code>
-              </pre>
+              <span>
+                <strong>{children}</strong>
+              </span>
             );
+
+          case "italic":
+            return (
+              <span>
+                <em>{children}</em>
+              </span>
+            );
+          case "underline":
+            return (
+              <span>
+                <u>{children}</u>
+              </span>
+            );
+
+          case "image":
+            debugger;
+          default:
+            return <span>{children}</span>;
         }
       }
     }

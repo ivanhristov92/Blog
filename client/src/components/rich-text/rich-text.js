@@ -1,4 +1,4 @@
-import { Editor } from "slate-react";
+import { Editor, getEventRange, getEventTransfer } from "slate-react";
 import "./rich-text.css";
 
 import React from "react";
@@ -12,7 +12,15 @@ import LooksTwoIcon from "@material-ui/icons/LooksTwo";
 import FormatQuoteIcon from "@material-ui/icons/FormatQuote";
 import FormatListNumberedIcon from "@material-ui/icons/FormatListNumbered";
 import FormatListBulletedIcon from "@material-ui/icons/FormatListBulleted";
+import ImageIcon from "@material-ui/icons/Image";
+import VideoLibraryIcon from "@material-ui/icons/VideoLibrary";
+import FormatAlignLeftIcon from "@material-ui/icons/FormatAlignLeft";
+import FormatAlignCenterIcon from "@material-ui/icons/FormatAlignCenter";
+import FormatAlignRightIcon from "@material-ui/icons/FormatAlignRight";
 import styled from "react-emotion";
+import imageExtensions from "image-extensions";
+import { Block } from "slate";
+import Video from "./video";
 
 export const Button = styled("span")`
   cursor: pointer;
@@ -44,6 +52,68 @@ const isBoldHotkey = isKeyHotkey("mod+b");
 const isItalicHotkey = isKeyHotkey("mod+i");
 const isUnderlinedHotkey = isKeyHotkey("mod+u");
 const isCodeHotkey = isKeyHotkey("mod+`");
+
+/*
+ * A function to determine whether a URL has an image extension.
+ *
+ * @param {String} url
+ * @return {Boolean}
+ */
+
+function isImage(url) {
+  return !!imageExtensions.find(url.endsWith);
+}
+
+/**
+ * A change function to standardize inserting images.
+ *
+ * @param {Editor} editor
+ * @param {String} src
+ * @param {Range} target
+ */
+
+function insertImage(editor, src, target) {
+  if (target) {
+    editor.select(target);
+  }
+
+  editor.insertBlock({
+    type: "image",
+    data: { src, class: "test" }
+  });
+}
+
+function insertVideo(editor, video, target) {
+  if (target) {
+    editor.select(target);
+  }
+
+  editor.insertBlock({
+    type: "video",
+    data: { video }
+  });
+}
+const schema = {
+  document: {
+    last: { type: "paragraph" },
+    normalize: (editor, { code, node, child }) => {
+      switch (code) {
+        case "last_child_type_invalid": {
+          const paragraph = Block.create("paragraph");
+          return editor.insertNodeByKey(node.key, node.nodes.size, paragraph);
+        }
+      }
+    }
+  },
+  blocks: {
+    image: {
+      isVoid: true
+    },
+    video: {
+      isVoid: true
+    }
+  }
+};
 
 /**
  * The rich text example.
@@ -105,16 +175,52 @@ class RichTextExample extends React.Component {
   render() {
     return (
       <div class="rich-text-wrapper">
+        <input
+          type={"file"}
+          hidden
+          ref={el => {
+            this.fileInput = el;
+          }}
+          onChange={e => {
+            console.log(this.editor);
+            console.log(e.target.files[0]);
+
+            for (const file of e.target.files) {
+              const reader = new FileReader();
+              const [mime] = file.type.split("/");
+              if (mime !== "image") continue;
+
+              reader.addEventListener("load", () => {
+                this.editor.command(insertImage, reader.result);
+              });
+
+              reader.readAsDataURL(file);
+            }
+            return;
+          }}
+        />
         <div className={"toolbar"}>
           {this.renderMarkButton("bold", <FormatBoldIcon />)}
           {this.renderMarkButton("italic", <FormatItalicIcon />)}
           {this.renderMarkButton("underlined", <FormatUnderlinedIcon />)}
           {this.renderMarkButton("code", <CodeIcon />)}
+          {this.renderMarkButton("format-right", <FormatAlignRightIcon />)}
+
           {this.renderBlockButton("heading-one", <LooksOneIcon />)}
           {this.renderBlockButton("heading-two", <LooksTwoIcon />)}
           {this.renderBlockButton("block-quote", <FormatQuoteIcon />)}
           {this.renderBlockButton("numbered-list", <FormatListNumberedIcon />)}
           {this.renderBlockButton("bulleted-list", <FormatListBulletedIcon />)}
+          <Button>
+            <ImageIcon onClick={() => this.fileInput.click()} />
+          </Button>
+          <Button>
+            <VideoLibraryIcon
+              onClick={() => {
+                this.editor.command(insertVideo);
+              }}
+            />
+          </Button>
         </div>
         <Editor
           className={"editor"}
@@ -127,10 +233,52 @@ class RichTextExample extends React.Component {
           onKeyDown={this.onKeyDown}
           renderNode={this.renderNode}
           renderMark={this.renderMark}
+          schema={schema}
+          onDrop={this.onDropOrPaste}
+          onPaste={this.onDropOrPaste}
         />
       </div>
     );
   }
+
+  /**
+   * On drop, insert the image wherever it is dropped.
+   *
+   * @param {Event} event
+   * @param {Editor} editor
+   * @param {Function} next
+   */
+  onDropOrPaste = (event, editor, next) => {
+    const target = getEventRange(event, editor);
+    if (!target && event.type === "drop") return next();
+
+    const transfer = getEventTransfer(event);
+    const { type, text, files } = transfer;
+
+    if (type === "files") {
+      for (const file of files) {
+        const reader = new FileReader();
+        const [mime] = file.type.split("/");
+        if (mime !== "image") continue;
+
+        reader.addEventListener("load", () => {
+          editor.command(insertImage, reader.result, target);
+        });
+
+        reader.readAsDataURL(file);
+      }
+      return;
+    }
+
+    if (type === "text") {
+      if (!isUrl(text)) return next();
+      if (!isImage(text)) return next();
+      editor.command(insertImage, text, target);
+      return;
+    }
+
+    next();
+  };
 
   /**
    * Render a mark-toggling toolbar button.
@@ -189,7 +337,7 @@ class RichTextExample extends React.Component {
 
   renderNode = (props, editor, next) => {
     const { attributes, children, node } = props;
-
+    console.log(props);
     switch (node.type) {
       case "block-quote":
         return <blockquote {...attributes}>{children}</blockquote>;
@@ -203,6 +351,11 @@ class RichTextExample extends React.Component {
         return <li {...attributes}>{children}</li>;
       case "numbered-list":
         return <ol {...attributes}>{children}</ol>;
+      case "image":
+        return <img src={node.data.get("src")} />;
+      case "video":
+        return <Video {...props} />;
+
       default:
         return next();
     }
@@ -227,6 +380,9 @@ class RichTextExample extends React.Component {
         return <em {...attributes}>{children}</em>;
       case "underlined":
         return <u {...attributes}>{children}</u>;
+      case "format-right":
+        debugger;
+        return <span style={{ textAlign: "right" }}>{children}</span>;
       default:
         return next();
     }

@@ -5,6 +5,11 @@ import EditIcon from "@material-ui/icons/Edit";
 import IconButton from "@material-ui/core/IconButton";
 import Tooltip from "@material-ui/core/Tooltip";
 import { equals } from "ramda";
+import Button from "@material-ui/core/Button/Button";
+import AddIcon from "@material-ui/icons/Add";
+import VisibilityIcon from "@material-ui/icons/Visibility";
+import VisibilityOffIcon from "@material-ui/icons/VisibilityOff";
+import { Link } from "react-router-dom";
 
 export default class ModelEntriesList extends React.Component {
   shouldComponentUpdate(nextProps) {
@@ -17,6 +22,12 @@ export default class ModelEntriesList extends React.Component {
       sort: true,
       customToolbarSelect: () => (
         <div style={{ display: "flex" }}>
+          <Tooltip title={"opsa"}>
+            <IconButton onClick={this.props.onPreviewClick}>
+              {this.props.preview ? <VisibilityOffIcon /> : <VisibilityIcon />}
+            </IconButton>
+          </Tooltip>
+
           <Tooltip title={"opsa"}>
             <IconButton onClick={this.props.onEditClick}>
               <EditIcon />
@@ -31,6 +42,16 @@ export default class ModelEntriesList extends React.Component {
         </div>
       ),
 
+      customToolbar: () => (
+        <Link
+          to={this.props.createButtonLinksTo}
+          className={"add-button-wrapper"}
+        >
+          <Button variant="fab" color="primary" aria-label="Add">
+            <AddIcon />
+          </Button>
+        </Link>
+      ),
       onRowsSelect: this.props.onRowsSelect,
 
       onRowsDelete: this.props.onRowDelete

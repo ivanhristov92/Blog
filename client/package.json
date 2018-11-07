@@ -44,7 +44,9 @@
   "dependencies": {
     "@material-ui/core": "^3.4.0",
     "@material-ui/icons": "^3.0.1",
+    "@slate-editor/alignment-plugin": "^5.1.0",
     "emotion": "^9.2.12",
+    "image-extensions": "^1.1.0",
     "immutable": "^4.0.0-rc.12",
     "is-hotkey": "^0.1.4",
     "lodash": "4.17.11",
