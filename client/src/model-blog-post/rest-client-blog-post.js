@@ -14,7 +14,7 @@ const post = new schema.Entity(
     processStrategy: (entity, parent, key) => {
       return {
         title: entity.title,
-        content: entity.content,
+        content: JSON.parse(entity.content),
         id: entity.id,
         featuredImage: entity.featuredImage,
         excerpt: entity.excerpt

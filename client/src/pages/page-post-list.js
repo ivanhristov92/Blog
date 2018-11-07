@@ -13,11 +13,11 @@ import * as _ from "ramda";
 
 import type { Props as EntryListProps } from "../components/model-entries-list";
 
-type SlateContentInJSON = string;
+type SlateContent = Object;
 
 type AdaptedPostFromServer = {
   title: string,
-  content: SlateContentInJSON,
+  content: SlateContent,
   excerpt: string,
   featuredImage: string,
   id: number
@@ -119,7 +119,7 @@ class _PostListPage extends React.Component {
   };
 
   doBulkEdit = data => {
-    let payload = this.mapSelectedToEntries().map(entry => {
+    let payload = this.mapSelectedIndexesToEntries().map(entry => {
       return {
         ...entry,
         ...data
@@ -149,7 +149,9 @@ class _PostListPage extends React.Component {
         bulkDeleteInitiated: false
       },
       () =>
-        this.props.deletePosts(this.mapSelectedToEntries().map(ent => ent.id))
+        this.props.deletePosts(
+          this.mapSelectedIndexesToEntries().map(ent => ent.id)
+        )
     );
   };
 
@@ -185,7 +187,7 @@ class _PostListPage extends React.Component {
               <h4 style={{ textAlign: "center" }}>Bulk Editing</h4>
             </Typography>
             <EditBlogPostForm
-              entries={this.mapSelectedToEntries()}
+              entries={this.mapSelectedIndexesToEntries()}
               onCancelEdit={this.cancelBulkEdit}
               onSubmit={this.doBulkEdit}
             />
@@ -196,7 +198,7 @@ class _PostListPage extends React.Component {
           this.state.previewGridSectionOpen &&
           this.state.selectedEntries.length && (
             <PostPreviewGrid
-              entries={this.mapSelectedToEntries()}
+              entries={this.mapSelectedIndexesToEntries()}
               navigateToPost={this.navigateToPost}
             />
           )}
@@ -231,7 +233,7 @@ class _PostListPage extends React.Component {
     return transform(allPosts);
   };
 
-  mapSelectedToEntries = () => {
+  mapSelectedIndexesToEntries = (): typeof Props.allPosts => {
     return this.state.selectedEntries.map(index => {
       return this.props.allPosts[index];
     });

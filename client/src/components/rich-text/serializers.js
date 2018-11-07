@@ -244,5 +244,5 @@ const initialEmptyValue = {
 export { initialEmptyValue };
 
 export function fromJSONToPlain(content) {
-  return Plain.serialize(Value.fromJSON(JSON.parse(content)));
+  return Plain.serialize(Value.fromJSON(content));
 }
