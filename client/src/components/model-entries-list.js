@@ -31,8 +31,30 @@ export type Props = {
 };
 
 export default class ModelEntriesList extends React.Component<Props> {
+  render() {
+    const options = {
+      filterType: "checkbox",
+      sort: true,
+      customToolbarSelect: this.renderCustomToolbarSelect,
+      customToolbar: this.renderCustomToolbar,
+      onRowsSelect: this.props.onRowsSelected,
+      rowsSelected: this.props.rowsSelected
+    };
+
+    return (
+      <div className="model-list-wrapper">
+        <MUIDataTable
+          title={this.props.title}
+          data={this.props.entries}
+          columns={this.props.columns}
+          options={options}
+        />
+      </div>
+    );
+  }
+
   renderCustomToolbarSelect = () => (
-    <div style={{ display: "flex" }}>
+    <div className={"custom-toolbar-select-wrapper"}>
       <Tooltip title={"Preview"}>
         <IconButton onClick={this.props.onPreviewClicked}>
           {this.props.isPreviewingActive ? (
@@ -67,26 +89,4 @@ export default class ModelEntriesList extends React.Component<Props> {
       <AddIcon />
     </Button>
   );
-
-  render() {
-    const options = {
-      filterType: "checkbox",
-      sort: true,
-      customToolbarSelect: this.renderCustomToolbarSelect,
-      customToolbar: this.renderCustomToolbar,
-      onRowsSelect: this.props.onRowsSelected,
-      rowsSelected: this.props.rowsSelected
-    };
-
-    return (
-      <div className="model-list-wrapper">
-        <MUIDataTable
-          title={this.props.title}
-          data={this.props.entries}
-          columns={this.props.columns}
-          options={options}
-        />
-      </div>
-    );
-  }
 }
