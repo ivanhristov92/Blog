@@ -15,7 +15,9 @@ const post = new schema.Entity(
       return {
         title: entity.title,
         content: entity.content,
-        id: entity.id
+        id: entity.id,
+        featuredImage: entity.featuredImage,
+        excerpt: entity.excerpt
       };
     }
   }

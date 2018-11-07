@@ -61,10 +61,14 @@ body {
 }
 
 .post-preview-card {
-    margin: 0 auto;
+    width:350px;
+    display: inline-block;
+    margin: 0 20px;
 }
 .post-preview-card  img {
- object-fit: contain;
+    object-fit: cover;
+    height: 200px;
+    width: 350px;
 }
 
 .post-content-image {
@@ -76,5 +80,27 @@ body {
 }
 
 .create-button-wrapper {
-    text-align: right;
+    text-align: left;
+}
+
+.featured-image-and-excerpt-wrapper {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+}
+
+.featured-image-wrapper {
+    display: inline-block;
+    width: 500px;
+    min-height: 200px;
+    background: lightgray;
+}
+
+.excerpt-field {
+    width: calc(100% - 540px);
+     margin-top: 0px !important;
+}
+
+.excerpt-wrapper {
+
 }

@@ -7,11 +7,15 @@ import RichText from "./rich-text/rich-text";
 import { Value } from "slate";
 import { initialValue } from "./rich-text/serializers";
 
+const defaultState = Object.freeze({
+  title: "",
+  content: Value.fromJS(initialValue),
+  featuredImage: "",
+  excerpt: ""
+});
+
 export default class NewBlogPostForm extends React.Component {
-  state = {
-    title: "",
-    content: Value.fromJSON(initialValue) //Value.fromJSON(initialValue)
-  };
+  state = defaultState;
 
   componentDidUpdate(prevProps) {
     if (prevProps.createState !== this.props.createState) {
@@ -48,10 +52,23 @@ export default class NewBlogPostForm extends React.Component {
   // === Title Field ====
   ///////////////////////
 
+  ///////////////////////
+  // Excerpt Field_____
+  ///////////////////////
+  handleExcerptChange = e => {
+    this.setState({
+      excerpt: e.target.value
+    });
+  };
+  // === Excerpt Field ====
+  ///////////////////////
+
   create = () => {
     let payload = {
       content: JSON.stringify(this.state.content.toJSON()),
-      title: this.state.title
+      title: this.state.title,
+      featuredImage: this.state.featuredImage,
+      excerpt: this.state.excerpt
     };
     console.log(JSON.stringify(this.state.content.toJSON()));
     this.props.onSubmit(payload);
@@ -82,20 +99,81 @@ export default class NewBlogPostForm extends React.Component {
             renderMark={this.renderMark}
             value={this.state.content}
           />
-          <div className={"create-button-wrapper"}>
-            <Button variant="contained" color="primary" onClick={this.create}>
-              Create
-            </Button>
-            <Button
-              variant="outlined"
-              color="secondary"
-              onClick={this.props.onCancel}
-            >
-              Cancel
-            </Button>
-          </div>
-          {this.renderErrors()}
         </Paper>
+        <div className={"create-button-wrapper"}>
+          <Button variant="contained" color="primary" onClick={this.create}>
+            Create
+          </Button>
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={this.props.onCancel}
+          >
+            Cancel
+          </Button>
+        </div>
+        {this.renderErrors()}
+        <input
+          type={"file"}
+          hidden
+          ref={el => {
+            this.featuredImage = el;
+          }}
+          onChange={e => {
+            for (const file of e.target.files) {
+              const reader = new FileReader();
+              const [mime] = file.type.split("/");
+              if (mime !== "image") continue;
+
+              reader.addEventListener("load", () => {
+                this.setState({ featuredImage: reader.result });
+              });
+
+              reader.readAsDataURL(file);
+            }
+            return;
+          }}
+        />
+        <hr style={{ margin: "40px 0" }} />
+        <div>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => {
+              this.featuredImage.click();
+            }}
+          >
+            Featured Image
+          </Button>
+        </div>
+        <div className={"featured-image-and-excerpt-wrapper"}>
+          <span className={"featured-image-wrapper"}>
+            {this.state.featuredImage && (
+              <img
+                src={this.state.featuredImage}
+                alt=""
+                style={{ maxWidth: 500 }}
+              />
+            )}
+          </span>
+
+          <TextField
+            className={"excerpt-field"}
+            id="outlined-full-width"
+            label="Excerpt"
+            value={this.state.excerpt}
+            onChange={this.handleExcerptChange}
+            placeholder={"Post Excerpt"}
+            margin="normal"
+            variant="outlined"
+            InputLabelProps={{
+              shrink: true
+            }}
+          />
+        </div>
+        <hr style={{ margin: "40px 0" }} />
+
+        <div />
       </div>
     );
   }

@@ -9,23 +9,26 @@ import CardMedia from "@material-ui/core/CardMedia";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 
+import placeholder from "../images/placeholder.jpg";
+
 function ImgMediaCard(props) {
   return (
     <Card className={"post-preview-card"}>
-      <CardActionArea>
+      <CardActionArea onClick={props.onActionAreaClicked}>
         <CardMedia
           component="img"
-          alt="Contemplative Reptile"
           height="140"
-          image="https://steemitimages.com/DQmPtcLEKJ18GS4zgD4PoUWMeeWjg6JARQMtXhNEhc8UTzv/other%20wildlife_iguana_profile_350x350.jpg"
-          title="Contemplative Reptile"
+          image={props.src || placeholder}
         />
         <CardContent>
           <Typography gutterBottom variant="h5" component="h2">
             {props.title}
           </Typography>
           <Typography component="p">
-            <div dangerouslySetInnerHTML={{ __html: props.content }} />
+            <div
+              dangerouslySetInnerHTML={{ __html: props.excerpt }}
+              className={"excerpt-wrapper"}
+            />
           </Typography>
         </CardContent>
       </CardActionArea>

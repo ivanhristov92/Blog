@@ -10,6 +10,13 @@ import Plain from "slate-plain-serializer";
 import { html } from "../components/rich-text/serializers";
 
 import Card from "../components/card";
+import GridList from "@material-ui/core/GridList/GridList";
+import GridListTile from "@material-ui/core/GridListTile/GridListTile";
+import ListSubheader from "@material-ui/core/ListSubheader/ListSubheader";
+import GridListTileBar from "@material-ui/core/GridListTileBar/GridListTileBar";
+import IconButton from "@material-ui/core/IconButton/IconButton";
+import InfoIcon from "@material-ui/core/SvgIcon/SvgIcon";
+import NewBlogPostForm from "../components/new-post-form";
 
 class _PostListPage extends React.Component {
   state = {
@@ -111,13 +118,35 @@ class _PostListPage extends React.Component {
             }}
           />
         )}
+        <div>
+          <GridList cellHeight={"auto"} cols={3}>
+            {this.mapSelectedToEntries().map(entry => (
+              <GridListTile key={entry.id} cols={1}>
+                <Card
+                  title={entry.title}
+                  src={entry.featuredImage}
+                  excerpt={entry.excerpt}
+                  onActionAreaClicked={() => {
+                    this.props.history.push(`/posts/${entry.id}`);
+                  }}
+                />
+              </GridListTile>
+            ))}
+          </GridList>
+        </div>
+
         {this.state.preview &&
-          this.state.selected.length === 1 && (
+          this.state.selected.length && (
             <div>
-              <Card
-                title={this.mapSelectedToEntries()[0].title}
-                content={dataForPreview}
-              />
+              {this.mapSelectedToEntries().map(entry => {
+                return (
+                  <Card
+                    title={entry.title}
+                    src={entry.featuredImage}
+                    excerpt={entry.excerpt}
+                  />
+                );
+              })}
             </div>
           )}
       </>
