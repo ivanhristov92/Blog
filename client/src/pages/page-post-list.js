@@ -1,5 +1,4 @@
 import React from "react";
-import { compose, pick, values } from "ramda";
 import ModelEntriesList from "../components/model-entries-list";
 import BlogPostModel from "../model-blog-post/model-blog-post";
 import EditBlogPostForm from "../components/edit-post-form";
@@ -45,18 +44,18 @@ class _PostListPage extends React.Component {
   props: Props;
 
   state: State = {
-    /* Keeps track of the selected table rows */
+    /** Keeps track of the selected table rows */
     selectedEntries: [],
 
-    /* Flag for bulk editing */
+    /** Flag for bulk editing */
     bulkEditSectionOpen: false,
 
-    /* Flag for showing a list of the selected
+    /** Flag for showing a list of the selected
      * table rows bellow the table
      */
     previewGridSectionOpen: false,
 
-    /* Flags the beginning of bulk/single delete */
+    /** Flags the beginning of bulk/single delete */
     bulkDeleteInitiated: false
   };
 
@@ -70,7 +69,9 @@ class _PostListPage extends React.Component {
     }
   }
 
-  // NAVIGATION
+  /**
+   * NAVIGATION
+   */
   navigateToPost = id => {
     this.props.history.push(`/posts/${id}`);
   };
@@ -82,21 +83,27 @@ class _PostListPage extends React.Component {
     this.navigateToPost(id);
   };
 
-  // SELECTION
+  /**
+   * SELECTION
+   */
   handleRowSelectionChange = (current, allSelected) => {
     this.setState({
       selectedEntries: allSelected.map(_.prop("dataIndex"))
     });
   };
 
-  // PREVIEW GRID - grid view of selected posts
+  /**
+   * PREVIEW GRID - grid view of selected posts
+   */
   togglePreview = () => {
     this.setState({
       previewGridSectionOpen: !this.state.previewGridSectionOpen
     });
   };
 
-  // EDITING
+  /**
+   * EDITING
+   */
   handleEditClicked = () => {
     if (this.state.selectedEntries.length === 1) {
       this.navigateToSelectedPost();
@@ -121,7 +128,9 @@ class _PostListPage extends React.Component {
     this.props.updatePosts(payload);
   };
 
-  // DELETING
+  /**
+   * DELETING
+   */
   initiateBulkDelete = () => {
     this.setState({
       bulkDeleteInitiated: true
@@ -144,6 +153,9 @@ class _PostListPage extends React.Component {
     );
   };
 
+  /**
+   * RENDER
+   */
   render() {
     let data = this.adaptPostsForEntryList(
       this.props.allPosts,
@@ -201,6 +213,9 @@ class _PostListPage extends React.Component {
     );
   }
 
+  /**
+   * Helpers
+   */
   adaptPostsForEntryList = (
     allPosts: typeof Props.allPosts,
     fields: Array<string>
@@ -216,14 +231,16 @@ class _PostListPage extends React.Component {
     return transform(allPosts);
   };
 
-  // Helper methods /////
-
   mapSelectedToEntries = () => {
     return this.state.selectedEntries.map(index => {
       return this.props.allPosts[index];
     });
   };
 }
+
+/**
+ * Connect With Redux
+ */
 
 const PostListPage = connect(
   function mapStateToProps(state) {
