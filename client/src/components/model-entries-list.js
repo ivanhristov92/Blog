@@ -8,14 +8,11 @@ import { equals } from "ramda";
 import Button from "@material-ui/core/Button/Button";
 import AddIcon from "@material-ui/icons/Add";
 import VisibilityIcon from "@material-ui/icons/Visibility";
+import CancelIcon from "@material-ui/icons/Cancel";
 import VisibilityOffIcon from "@material-ui/icons/VisibilityOff";
 import { Link } from "react-router-dom";
 
 export default class ModelEntriesList extends React.Component {
-  shouldComponentUpdate(nextProps) {
-    return !equals(nextProps.data, this.props.data);
-  }
-
   render() {
     const options = {
       filterType: "checkbox",
@@ -28,9 +25,9 @@ export default class ModelEntriesList extends React.Component {
             </IconButton>
           </Tooltip>
 
-          <Tooltip title={"opsa"}>
-            <IconButton onClick={this.props.onEditClick}>
-              <EditIcon />
+          <Tooltip title={this.props.editing ? "Cencel Editing" : "Edit"}>
+            <IconButton onClick={this.props.onEditClicked}>
+              {this.props.editing ? <CancelIcon /> : <EditIcon />}
             </IconButton>
           </Tooltip>
 
@@ -54,7 +51,8 @@ export default class ModelEntriesList extends React.Component {
       ),
       onRowsSelect: this.props.onRowsSelect,
 
-      onRowsDelete: this.props.onRowDelete
+      onRowsDelete: this.props.onRowDelete,
+      rowsSelected: this.props.rowsSelected
     };
 
     let columns = this.props.fields;

@@ -51,7 +51,7 @@ class _PostListPage extends React.Component {
     }
 
     this.setState({
-      openEdit: true
+      openEdit: !this.state.openEdit
     });
   };
 
@@ -90,27 +90,26 @@ class _PostListPage extends React.Component {
     );
     console.log(data);
 
-    let dataForPreview = this.mapSelectedToEntries().map(obj => {
-      return html.serialize(Value.fromJSON(JSON.parse(obj.content)));
-    });
     return (
       <>
         <div id={"model-wrapper"}>
           <ModelEntriesList
             modelName={BlogPostModel.MODEL_NAME}
+            rowsSelected={this.state.selected.map(s => s.index)}
             fields={fields}
             data={data}
             onRowsSelect={this.onRowsSelect}
-            onEditClick={() => {
+            onEditClicked={() => {
               if (this.state.selected.length === 1) {
                 let itemIndex = this.state.selected[0].index;
                 let item = this.props.allPosts[itemIndex];
                 let id = item.id;
                 this.props.history.push(`/posts/${id}`);
               } else {
-                this.setState({ openEdit: true });
+                this.setState({ openEdit: !this.state.openEdit });
               }
             }}
+            editing={this.state.openEdit}
             onDeleteClick={this.onDeleteClicked}
             createButtonLinksTo={"/posts/new"}
             onPreviewClick={() => {
