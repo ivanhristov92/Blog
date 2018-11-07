@@ -98,6 +98,11 @@ body {
     background: lightgray;
 }
 
+.featured-image-wrapper img {
+    width: 500px;
+    min-height: 200px;
+}
+
 .excerpt-field {
     width: calc(100% - 540px);
      margin-top: 0px !important;

@@ -6,6 +6,7 @@ import { Paper } from "@material-ui/core";
 import Chip from "@material-ui/core/Chip";
 import RichText from "./rich-text/rich-text";
 import { Value } from "slate";
+import placeholder from "../images/placeholder.jpg";
 
 const initialEditorValue = {
   document: {
@@ -185,13 +186,28 @@ export default class EditBlogPostForm extends React.Component {
         </div>
         <div className={"featured-image-and-excerpt-wrapper"}>
           <span className={"featured-image-wrapper"}>
-            {this.state.featuredImage && (
+            <>
               <img
                 src={this.state.featuredImage}
                 alt=""
                 style={{ maxWidth: 500 }}
               />
-            )}
+              {this.state.featuredImage && (
+                <div style={{ background: "white", textAlign: "right" }}>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    onClick={() => {
+                      this.setState({
+                        featuredImage: defaultState.featuredImage
+                      });
+                    }}
+                  >
+                    Delete
+                  </Button>
+                </div>
+              )}
+            </>
           </span>
 
           <TextField
