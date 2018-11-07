@@ -39,6 +39,8 @@ type Props = {
   history: Object
 };
 
+const ENTRY_LIST_FIELDS = ["id", "title", "content"];
+
 class _PostListPage extends React.Component {
   props: Props;
 
@@ -143,8 +145,10 @@ class _PostListPage extends React.Component {
   };
 
   render() {
-    let fields = ["id", "title", "content"];
-    let data = this.adaptPostsForEntryList();
+    let data = this.adaptPostsForEntryList(
+      this.props.allPosts,
+      ENTRY_LIST_FIELDS
+    );
 
     return (
       <>
@@ -152,7 +156,7 @@ class _PostListPage extends React.Component {
           <ModelEntriesList
             modelName={BlogPostModel.MODEL_NAME}
             rowsSelected={this.state.selectedEntries}
-            fields={fields}
+            fields={ENTRY_LIST_FIELDS}
             data={data}
             onRowsSelect={this.handleRowSelectionChange}
             onEditClicked={this.handleEditClicked}
@@ -197,9 +201,10 @@ class _PostListPage extends React.Component {
     );
   }
 
-  adaptPostsForEntryList = (): typeof EntryListProps.entries => {
-    let fields = ["id", "title", "content"];
-
+  adaptPostsForEntryList = (
+    allPosts: typeof Props.allPosts,
+    fields: Array<string>
+  ): typeof EntryListProps.entries => {
     let transform = _.map(
       _.compose(
         _.values,
@@ -208,7 +213,7 @@ class _PostListPage extends React.Component {
       )
     );
 
-    return transform(this.props.allPosts);
+    return transform(allPosts);
   };
 
   // Helper methods /////
