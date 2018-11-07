@@ -1,12 +1,11 @@
 import React from "react";
 import { compose, pick, values } from "ramda";
-import { Value } from "slate";
 import ModelEntriesList from "../components/model-entries-list";
 import BlogPostModel from "../model-blog-post/model-blog-post";
 import EditBlogPostForm from "../components/edit-post-form";
 import connect from "react-redux/es/connect/connect";
 import { bindActionCreators } from "redux";
-import Plain from "slate-plain-serializer";
+import { fromJSONToPlain } from "../components/rich-text/serializers";
 
 import Typography from "@material-ui/core/Typography";
 
@@ -16,15 +15,18 @@ import PostPreviewGrid from "../components/post-preview-grid";
 class _PostListPage extends React.Component {
   state = {
     /* Keeps track of the selected table rows */
-    selected: [],
+    selectedEntries: [],
+
     /* Flag for bulk editing */
-    openEdit: false,
+    bulkEditSectionOpen: false,
+
     /* Flag for showing a list of the selected
      * table rows bellow the table
      */
-    preview: false,
+    previewGridSectionOpen: false,
+
     /* Flags the beginning of bulk/single delete */
-    deleteInitiated: false
+    bulkDeleteInitiated: false
   };
 
   componentWillMount() {
@@ -32,7 +34,7 @@ class _PostListPage extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (prevState.selected !== this.state.selected) {
+    if (prevState.selectedEntries !== this.state.selectedEntries) {
       this.cancelBulkEdit();
     }
   }
@@ -43,7 +45,7 @@ class _PostListPage extends React.Component {
   };
 
   navigateToSelectedPost = () => {
-    let itemIndex = this.state.selected[0].index;
+    let itemIndex = this.state.selectedEntries[0].index;
     let item = this.props.allPosts[itemIndex];
     let id = item.id;
     this.navigateToPost(id);
@@ -52,30 +54,30 @@ class _PostListPage extends React.Component {
   // SELECTION
   handleRowSelectionChange = (current, allSelected) => {
     this.setState({
-      selected: allSelected
+      selectedEntries: allSelected
     });
   };
 
   // PREVIEW GRID - grid view of selected posts
   togglePreview = () => {
     this.setState({
-      preview: !this.state.preview
+      previewGridSectionOpen: !this.state.previewGridSectionOpen
     });
   };
 
   // EDITING
   handleEditClicked = () => {
-    if (this.state.selected.length === 1) {
+    if (this.state.selectedEntries.length === 1) {
       this.navigateToSelectedPost();
     } else {
       this.toggleBulkEdit();
     }
   };
   toggleBulkEdit = () => {
-    this.setState({ openEdit: !this.state.openEdit });
+    this.setState({ bulkEditSectionOpen: !this.state.bulkEditSectionOpen });
   };
   cancelBulkEdit = () => {
-    this.setState({ openEdit: false });
+    this.setState({ bulkEditSectionOpen: false });
   };
 
   doBulkEdit = data => {
@@ -91,20 +93,20 @@ class _PostListPage extends React.Component {
   // DELETING
   initiateBulkDelete = () => {
     this.setState({
-      deleteInitiated: true
+      bulkDeleteInitiated: true
     });
   };
 
   cancelDelete = () => {
     this.setState({
-      deleteInitiated: false
+      bulkDeleteInitiated: false
     });
   };
 
   closeDialogAndDoDelete = () => {
     this.setState(
       {
-        deleteInitiated: false
+        bulkDeleteInitiated: false
       },
       () =>
         this.props.deletePosts(this.mapSelectedToEntries().map(ent => ent.id))
@@ -120,19 +122,19 @@ class _PostListPage extends React.Component {
         <div id={"model-wrapper"}>
           <ModelEntriesList
             modelName={BlogPostModel.MODEL_NAME}
-            rowsSelected={this.state.selected.map(s => s.index)}
+            rowsSelected={this.state.selectedEntries.map(s => s.index)}
             fields={fields}
             data={data}
             onRowsSelect={this.handleRowSelectionChange}
             onEditClicked={this.handleEditClicked}
-            editing={this.state.openEdit}
+            editing={this.state.bulkEditSectionOpen}
             onDeleteClick={this.initiateBulkDelete}
             createButtonLinksTo={"/posts/new"}
             onPreviewClick={this.togglePreview}
-            preview={this.state.preview}
+            preview={this.state.previewGridSectionOpen}
           />
         </div>
-        {this.state.openEdit && (
+        {this.state.bulkEditSectionOpen && (
           <>
             <Typography variant="h4" color="inherit">
               <h4 style={{ textAlign: "center" }}>Bulk Editing</h4>
@@ -145,9 +147,9 @@ class _PostListPage extends React.Component {
           </>
         )}
 
-        {!this.state.openEdit &&
-          this.state.preview &&
-          this.state.selected.length && (
+        {!this.state.bulkEditSectionOpen &&
+          this.state.previewGridSectionOpen &&
+          this.state.selectedEntries.length && (
             <PostPreviewGrid
               entries={this.mapSelectedToEntries()}
               navigateToPost={this.navigateToPost}
@@ -155,8 +157,8 @@ class _PostListPage extends React.Component {
           )}
 
         <DeletePromptDialog
-          open={this.state.deleteInitiated}
-          message={`${this.state.selected.length} / ${
+          open={this.state.bulkDeleteInitiated}
+          message={`${this.state.selectedEntries.length} / ${
             this.props.allPosts.length
           } entries selected. Are you sure you want to delete them?`}
           onCancel={this.cancelDelete}
@@ -175,7 +177,7 @@ class _PostListPage extends React.Component {
         obj => {
           return {
             ...obj,
-            content: Plain.serialize(Value.fromJSON(JSON.parse(obj.content)))
+            content: fromJSONToPlain(obj.content)
           };
         },
         pick(fields)
@@ -187,7 +189,7 @@ class _PostListPage extends React.Component {
   // Helper methods /////
 
   mapSelectedToEntries = () => {
-    return this.state.selected.map(({ index }) => {
+    return this.state.selectedEntries.map(({ index }) => {
       return this.props.allPosts[index];
     });
   };

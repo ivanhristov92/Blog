@@ -1,5 +1,7 @@
 import Html from "slate-html-serializer";
 import React from "react";
+import { Value } from "slate";
+import Plain from "slate-plain-serializer";
 
 const BLOCK_TAGS = {
   blockquote: "quote",
@@ -240,3 +242,7 @@ const initialEmptyValue = {
   }
 };
 export { initialEmptyValue };
+
+export function fromJSONToPlain(content) {
+  return Plain.serialize(Value.fromJSON(JSON.parse(content)));
+}
