@@ -36,6 +36,10 @@ body {
     padding: 20px;
 }
 
+input {
+    background: white !important;
+}
+
 .code-section-internal-wrapper {
     display: flex;
     width: 100%;

@@ -9,6 +9,8 @@ import { Value } from "slate";
 import placeholder from "../images/placeholder.jpg";
 import { Prompt } from "react-router-dom";
 
+import * as _ from "ramda";
+
 const initialEditorValue = {
   document: {
     nodes: [
@@ -105,37 +107,39 @@ export default class EditBlogPostForm extends React.Component {
   };
 
   render() {
+    const hasChanges = () => {
+      if (!this.props.entries[0]) {
+        return false;
+      }
+
+      let a = _.pick(["title", "excerpt", "featuredImage"], this.state);
+      let b = _.pick(
+        ["title", "excerpt", "featuredImage"],
+        this.props.entries[0]
+      );
+
+      let areDif = !_.equals(a, b);
+
+      let aaa = JSON.stringify(this.state.content.toJSON());
+      let bbb = this.props.entries[0].content;
+      let contentsAreDiff = !_.equals(aaa, bbb);
+
+      return areDif || contentsAreDiff;
+    };
+
+    if (this.props.entries[0]) {
+      console.log("hasChanges", hasChanges());
+    }
+
     return (
       <div className="new-post-form-wrapper">
         <Prompt
-          when={true}
+          when={hasChanges()}
           message={location =>
             `Are you sure you want to go to ${location.pathname}`
           }
         />
 
-        <div className={"create-button-wrapper"}>
-          <Button variant="outlined" color="primary" onClick={this.edit}>
-            Edit
-          </Button>
-          <Button
-            variant="outlined"
-            color="secondary"
-            onClick={this.props.onCancelEdit}
-          >
-            Cancel
-          </Button>
-
-          {this.props.deletePost && (
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={this.props.deletePost}
-            >
-              Delete
-            </Button>
-          )}
-        </div>
         <div className={"new-post-title-wrapper"}>
           <TextField
             id="outlined-full-width"
@@ -160,6 +164,28 @@ export default class EditBlogPostForm extends React.Component {
             value={this.state.content}
           />
         </Paper>
+        <div className={"create-button-wrapper"}>
+          <Button variant="contained" color="primary" onClick={this.edit}>
+            Edit
+          </Button>
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={this.props.onCancelEdit}
+          >
+            Cancel
+          </Button>
+
+          {this.props.deletePost && (
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={this.props.deletePost}
+            >
+              Delete
+            </Button>
+          )}
+        </div>
         <input
           type={"file"}
           hidden

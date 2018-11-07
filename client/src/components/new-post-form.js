@@ -6,6 +6,8 @@ import Chip from "@material-ui/core/Chip";
 import RichText from "./rich-text/rich-text";
 import { Value } from "slate";
 import { initialValue } from "./rich-text/serializers";
+import { Prompt } from "react-router-dom";
+import * as _ from "ramda";
 
 const defaultState = Object.freeze({
   title: "",
@@ -74,8 +76,30 @@ export default class NewBlogPostForm extends React.Component {
     this.props.onSubmit(payload);
   };
   render() {
+    const hasChanges = () => {
+      let a = _.pick(["title", "excerpt", "featuredImage"], this.state);
+      let b = _.pick(["title", "excerpt", "featuredImage"], defaultState);
+
+      let areDif = !_.equals(a, b);
+
+      let aaa = JSON.stringify(this.state.content.toJSON());
+      let bbb = JSON.stringify(defaultState.content.toJSON());
+      let contentsAreDiff = !_.equals(aaa, bbb);
+
+      return areDif || contentsAreDiff;
+    };
+
+    console.log("hasChanges", hasChanges());
+
     return (
       <div className="new-post-form-wrapper">
+        <Prompt
+          when={hasChanges()}
+          message={location =>
+            `Are you sure you want to go to ${location.pathname}`
+          }
+        />
+
         <div className={"new-post-title-wrapper"}>
           <TextField
             id="outlined-full-width"
