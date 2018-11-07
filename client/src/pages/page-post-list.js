@@ -7,7 +7,6 @@ import EditBlogPostForm from "../components/edit-post-form";
 import connect from "react-redux/es/connect/connect";
 import { bindActionCreators } from "redux";
 import Plain from "slate-plain-serializer";
-import { html } from "../components/rich-text/serializers";
 
 import Card from "../components/card";
 import GridList from "@material-ui/core/GridList/GridList";
@@ -20,42 +19,45 @@ import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
-import Toolbar from "@material-ui/core/Toolbar/Toolbar";
 
 class _PostListPage extends React.Component {
   state = {
+    /* Keeps track of the selected table rows */
     selected: [],
+    /* Flag for bulk editing */
     openEdit: false,
+    /* Flag for showing a list of the selected
+     * table rows bellow the table
+     */
     preview: false,
+    /* Flags the beginning of bulk/single delete */
     deleteInitiated: false
   };
-
-  componentDidUpdate(prevProps, prevState) {
-    if (prevState.selected !== this.state.selected) {
-      this.setState({ openEdit: false });
-    }
-  }
 
   componentWillMount() {
     this.props.readPosts();
   }
 
-  onRowsSelect = (current, selected) => {
-    this.setState({
-      selected
-    });
-  };
-
-  onEditClicked = () => {
-    if (this.state.selected.length === 1) {
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.selected !== this.state.selected) {
+      this.cancelBulkEdit();
     }
+  }
 
+  // SELECTION
+  handleRowSelectionChange = (current, allSelected) => {
     this.setState({
-      openEdit: !this.state.openEdit
+      selected: allSelected
     });
   };
 
-  onDeleteClicked = () => {
+  // EDITING
+  cancelBulkEdit = () => {
+    this.setState({ openEdit: false });
+  };
+
+  // DELETING
+  initiateBulkDelete = () => {
     this.setState({
       deleteInitiated: true
     });
@@ -66,12 +68,9 @@ class _PostListPage extends React.Component {
       {
         deleteInitiated: false
       },
-      this.doDelete()
+      () =>
+        this.props.deletePosts(this.mapSelectedToEntries().map(ent => ent.id))
     );
-  };
-
-  doDelete = () => {
-    this.props.deletePosts(this.mapSelectedToEntries().map(ent => ent.id));
   };
 
   render() {
@@ -98,7 +97,7 @@ class _PostListPage extends React.Component {
             rowsSelected={this.state.selected.map(s => s.index)}
             fields={fields}
             data={data}
-            onRowsSelect={this.onRowsSelect}
+            onRowsSelect={this.handleRowSelectionChange}
             onEditClicked={() => {
               if (this.state.selected.length === 1) {
                 let itemIndex = this.state.selected[0].index;
@@ -110,7 +109,7 @@ class _PostListPage extends React.Component {
               }
             }}
             editing={this.state.openEdit}
-            onDeleteClick={this.onDeleteClicked}
+            onDeleteClick={this.initiateBulkDelete}
             createButtonLinksTo={"/posts/new"}
             onPreviewClick={() => {
               this.setState({
