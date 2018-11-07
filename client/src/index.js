@@ -5,7 +5,7 @@ import { Provider } from "react-redux";
 import BlogApp from "./app";
 import store from "./store";
 
-import { attachAnUnexpectedErrorLogger } from "redux-manager-lib";
+import "./global-error-handling";
 
 export default class App extends React.Component {
   render() {
@@ -16,10 +16,5 @@ export default class App extends React.Component {
     );
   }
 }
-
-attachAnUnexpectedErrorLogger();
-document.addEventListener("unexpectedruntimeerror", reduxManagerLibError => {
-  alert("Unexpected Runtime Error - Check the console");
-});
 
 ReactDOM.render(<App />, document.getElementById("app"));

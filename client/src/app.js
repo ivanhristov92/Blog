@@ -1,6 +1,6 @@
 import React from "react";
 import AppBar from "./components/app-bar";
-import { BrowserRouter as Router, Route, Switch, Link } from "react-router-dom";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import PostListPage from "./pages/page-post-list";
 import NewPostPage from "./pages/page-new-post";
 import PostDetailsPage from "./pages/page-update-post";
