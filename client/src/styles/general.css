@@ -108,8 +108,13 @@ input {
     box-shadow:0 0 0 3px rgba(211, 211, 211, 0.16);
 }
 
-.excerpt-field {
+.excerpt-field-wrapper {
     width: calc(100% - 540px);
+     margin-top: 0px !important;
+}
+
+.excerpt-field {
+    width: 100%;
      margin-top: 0px !important;
 }
 

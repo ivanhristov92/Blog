@@ -222,7 +222,7 @@ export default class EditBlogPostForm extends React.Component {
               </Button>
             </div>
             <img
-              src={this.state.featuredImage}
+              src={this.state.featuredImage || "/" + placeholder}
               alt=""
               style={{ maxWidth: 500 }}
             />
@@ -242,21 +242,23 @@ export default class EditBlogPostForm extends React.Component {
               </div>
             )}
           </span>
-
-          <TextField
-            className={"excerpt-field"}
-            id="outlined-full-width"
-            label="Excerpt"
-            multiline={true}
-            value={this.state.excerpt}
-            onChange={this.handleExcerptChange}
-            placeholder={"Post Excerpt"}
-            margin="normal"
-            variant="outlined"
-            InputLabelProps={{
-              shrink: true
-            }}
-          />
+          <div className={"excerpt-field-wrapper"}>
+            <div style={{ height: 36 }} />
+            <TextField
+              id="outlined-full-width"
+              className={"excerpt-field"}
+              label="Excerpt"
+              multiline={true}
+              value={this.state.excerpt}
+              onChange={this.handleExcerptChange}
+              placeholder={"Post Excerpt"}
+              margin="normal"
+              variant="outlined"
+              InputLabelProps={{
+                shrink: true
+              }}
+            />
+          </div>
         </div>
         <hr style={{ margin: "40px 0" }} />
         <div />

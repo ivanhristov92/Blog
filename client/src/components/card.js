@@ -18,7 +18,7 @@ function ImgMediaCard(props) {
         <CardMedia
           component="img"
           height="140"
-          image={props.src || placeholder}
+          image={props.src || "/" + placeholder}
         />
         <CardContent>
           <Typography gutterBottom variant="h5" component="h2">

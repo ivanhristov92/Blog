@@ -8,6 +8,7 @@ import { Value } from "slate";
 import { initialValue } from "./rich-text/serializers";
 import { Prompt } from "react-router-dom";
 import * as _ from "ramda";
+import placeholder from "../images/placeholder.jpg";
 
 const defaultState = Object.freeze({
   title: "",
@@ -159,41 +160,59 @@ export default class NewBlogPostForm extends React.Component {
           }}
         />
         <hr style={{ margin: "40px 0" }} />
-        <div>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => {
-              this.featuredImage.click();
-            }}
-          >
-            Featured Image
-          </Button>
-        </div>
+
         <div className={"featured-image-and-excerpt-wrapper"}>
           <span className={"featured-image-wrapper"}>
+            <div>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => {
+                  this.featuredImage.click();
+                }}
+              >
+                {this.state.featuredImage ? "Change Image" : "Featured Image"}
+              </Button>
+            </div>
+            <img
+              src={this.state.featuredImage || "/" + placeholder}
+              alt=""
+              style={{ maxWidth: 500 }}
+            />
             {this.state.featuredImage && (
-              <img
-                src={this.state.featuredImage}
-                alt=""
-                style={{ maxWidth: 500 }}
-              />
+              <div style={{ background: "white", textAlign: "right" }}>
+                <Button
+                  variant="outlined"
+                  color="secondary"
+                  onClick={() => {
+                    this.setState({
+                      featuredImage: defaultState.featuredImage
+                    });
+                  }}
+                >
+                  Delete
+                </Button>
+              </div>
             )}
           </span>
 
-          <TextField
-            className={"excerpt-field"}
-            id="outlined-full-width"
-            label="Excerpt"
-            value={this.state.excerpt}
-            onChange={this.handleExcerptChange}
-            placeholder={"Post Excerpt"}
-            margin="normal"
-            variant="outlined"
-            InputLabelProps={{
-              shrink: true
-            }}
-          />
+          <div className={"excerpt-field-wrapper"}>
+            <div style={{ height: 36 }} />
+            <TextField
+              id="outlined-full-width"
+              className={"excerpt-field"}
+              label="Excerpt"
+              multiline={true}
+              value={this.state.excerpt}
+              onChange={this.handleExcerptChange}
+              placeholder={"Post Excerpt"}
+              margin="normal"
+              variant="outlined"
+              InputLabelProps={{
+                shrink: true
+              }}
+            />
+          </div>
         </div>
         <hr style={{ margin: "40px 0" }} />
 
