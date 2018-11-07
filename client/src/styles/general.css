@@ -111,3 +111,7 @@ body {
 .excerpt-wrapper {
 
 }
+
+.editor {
+    min-height: 300px;
+}

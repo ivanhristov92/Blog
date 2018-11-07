@@ -12,17 +12,22 @@ import { html } from "../components/rich-text/serializers";
 import Card from "../components/card";
 import GridList from "@material-ui/core/GridList/GridList";
 import GridListTile from "@material-ui/core/GridListTile/GridListTile";
-import ListSubheader from "@material-ui/core/ListSubheader/ListSubheader";
-import GridListTileBar from "@material-ui/core/GridListTileBar/GridListTileBar";
-import IconButton from "@material-ui/core/IconButton/IconButton";
-import InfoIcon from "@material-ui/core/SvgIcon/SvgIcon";
-import NewBlogPostForm from "../components/new-post-form";
+
+import Dialog from "@material-ui/core/Dialog";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogContentText from "@material-ui/core/DialogContentText";
+import DialogTitle from "@material-ui/core/DialogTitle";
+import Button from "@material-ui/core/Button";
+import Typography from "@material-ui/core/Typography";
+import Toolbar from "@material-ui/core/Toolbar/Toolbar";
 
 class _PostListPage extends React.Component {
   state = {
     selected: [],
     openEdit: false,
-    preview: false
+    preview: false,
+    deleteInitiated: false
   };
 
   componentDidUpdate(prevProps, prevState) {
@@ -50,7 +55,22 @@ class _PostListPage extends React.Component {
     });
   };
 
-  onDelete = () => {
+  onDeleteClicked = () => {
+    this.setState({
+      deleteInitiated: true
+    });
+  };
+
+  closeDialogAndDoDelete = () => {
+    this.setState(
+      {
+        deleteInitiated: false
+      },
+      this.doDelete()
+    );
+  };
+
+  doDelete = () => {
     this.props.deletePosts(this.mapSelectedToEntries().map(ent => ent.id));
   };
 
@@ -91,7 +111,7 @@ class _PostListPage extends React.Component {
                 this.setState({ openEdit: true });
               }
             }}
-            onDeleteClick={this.onDelete}
+            onDeleteClick={this.onDeleteClicked}
             createButtonLinksTo={"/posts/new"}
             onPreviewClick={() => {
               this.setState({
@@ -102,24 +122,30 @@ class _PostListPage extends React.Component {
           />
         </div>
         {this.state.openEdit && (
-          <EditBlogPostForm
-            entries={this.mapSelectedToEntries()}
-            onCancelEdit={() => {
-              this.setState({ openEdit: false });
-            }}
-            onSubmit={data => {
-              let payload = this.mapSelectedToEntries().map(entry => {
-                return {
-                  ...entry,
-                  ...data
-                };
-              });
-              this.props.updatePosts(payload);
-            }}
-          />
+          <>
+            <Typography variant="h4" color="inherit">
+              <h4 style={{ textAlign: "center" }}>Bulk Editing</h4>
+            </Typography>
+            <EditBlogPostForm
+              entries={this.mapSelectedToEntries()}
+              onCancelEdit={() => {
+                this.setState({ openEdit: false });
+              }}
+              onSubmit={data => {
+                let payload = this.mapSelectedToEntries().map(entry => {
+                  return {
+                    ...entry,
+                    ...data
+                  };
+                });
+                this.props.updatePosts(payload);
+              }}
+            />
+          </>
         )}
 
-        {this.state.preview &&
+        {!this.state.openEdit &&
+          this.state.preview &&
           this.state.selected.length && (
             <div>
               <GridList cellHeight={"auto"} cols={3}>
@@ -138,6 +164,35 @@ class _PostListPage extends React.Component {
               </GridList>
             </div>
           )}
+
+        <Dialog
+          open={this.state.deleteInitiated}
+          onClose={() => {}}
+          aria-labelledby="form-dialog-title"
+        >
+          <DialogTitle id="form-dialog-title">Delete</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              {this.state.selected.length} / {this.props.allPosts.length}{" "}
+              entries selected. Are you sure you want to delete them?
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              onClick={() => {
+                this.setState({
+                  deleteInitiated: false
+                });
+              }}
+              color="primary"
+            >
+              Cancel
+            </Button>
+            <Button onClick={this.closeDialogAndDoDelete} color="secondary">
+              Delete
+            </Button>
+          </DialogActions>
+        </Dialog>
       </>
     );
   }
