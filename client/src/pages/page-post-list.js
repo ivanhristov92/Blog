@@ -118,35 +118,24 @@ class _PostListPage extends React.Component {
             }}
           />
         )}
-        <div>
-          <GridList cellHeight={"auto"} cols={3}>
-            {this.mapSelectedToEntries().map(entry => (
-              <GridListTile key={entry.id} cols={1}>
-                <Card
-                  title={entry.title}
-                  src={entry.featuredImage}
-                  excerpt={entry.excerpt}
-                  onActionAreaClicked={() => {
-                    this.props.history.push(`/posts/${entry.id}`);
-                  }}
-                />
-              </GridListTile>
-            ))}
-          </GridList>
-        </div>
 
         {this.state.preview &&
           this.state.selected.length && (
             <div>
-              {this.mapSelectedToEntries().map(entry => {
-                return (
-                  <Card
-                    title={entry.title}
-                    src={entry.featuredImage}
-                    excerpt={entry.excerpt}
-                  />
-                );
-              })}
+              <GridList cellHeight={"auto"} cols={3}>
+                {this.mapSelectedToEntries().map(entry => (
+                  <GridListTile key={entry.id} cols={1}>
+                    <Card
+                      title={entry.title}
+                      src={entry.featuredImage}
+                      excerpt={entry.excerpt}
+                      onActionAreaClicked={() => {
+                        this.props.history.push(`/posts/${entry.id}`);
+                      }}
+                    />
+                  </GridListTile>
+                ))}
+              </GridList>
             </div>
           )}
       </>

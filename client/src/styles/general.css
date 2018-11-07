@@ -61,14 +61,16 @@ body {
 }
 
 .post-preview-card {
-    width:350px;
+    width:100%;
+    max-width: 530px;
     display: inline-block;
     margin: 0 20px;
 }
 .post-preview-card  img {
     object-fit: cover;
-    height: 200px;
-    width: 350px;
+    width: 100%;
+    min-height: 200px;
+    height: auto;
 }
 
 .post-content-image {
