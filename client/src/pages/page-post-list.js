@@ -1,3 +1,5 @@
+// @flow
+
 import React from "react";
 import ModelEntriesList from "../components/model-entries-list";
 import BlogPostModel from "../model-blog-post/model-blog-post";
@@ -41,10 +43,8 @@ type Props = {
 
 const ENTRY_LIST_COLUMNS = ["id", "title", "content"];
 
-class _PostListPage extends React.Component {
-  props: Props;
-
-  state: State = {
+class _PostListPage extends React.Component<Props, State> {
+  state = {
     /** Keeps track of the selected table rows */
     selectedEntryIndexes: [],
 
