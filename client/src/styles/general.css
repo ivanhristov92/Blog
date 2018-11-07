@@ -4,6 +4,7 @@ html, body, #app {
 body {
     margin: 0;
     padding: 0px 8px;
+    background: #fafafa;
 }
 #app {
 }
@@ -82,7 +83,7 @@ body {
 }
 
 .create-button-wrapper {
-    text-align: left;
+    text-align: right;
 }
 
 .featured-image-and-excerpt-wrapper {
@@ -94,13 +95,13 @@ body {
 .featured-image-wrapper {
     display: inline-block;
     width: 500px;
-    min-height: 200px;
-    background: lightgray;
 }
 
 .featured-image-wrapper img {
     width: 500px;
-    min-height: 200px;
+    min-height: 300px;
+    display: inline-block;
+    box-shadow:0 0 0 3px rgba(211, 211, 211, 0.16);
 }
 
 .excerpt-field {

@@ -7,6 +7,7 @@ import Chip from "@material-ui/core/Chip";
 import RichText from "./rich-text/rich-text";
 import { Value } from "slate";
 import placeholder from "../images/placeholder.jpg";
+import { Prompt } from "react-router-dom";
 
 const initialEditorValue = {
   document: {
@@ -106,6 +107,35 @@ export default class EditBlogPostForm extends React.Component {
   render() {
     return (
       <div className="new-post-form-wrapper">
+        <Prompt
+          when={true}
+          message={location =>
+            `Are you sure you want to go to ${location.pathname}`
+          }
+        />
+
+        <div className={"create-button-wrapper"}>
+          <Button variant="outlined" color="primary" onClick={this.edit}>
+            Edit
+          </Button>
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={this.props.onCancelEdit}
+          >
+            Cancel
+          </Button>
+
+          {this.props.deletePost && (
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={this.props.deletePost}
+            >
+              Delete
+            </Button>
+          )}
+        </div>
         <div className={"new-post-title-wrapper"}>
           <TextField
             id="outlined-full-width"
@@ -130,27 +160,6 @@ export default class EditBlogPostForm extends React.Component {
             value={this.state.content}
           />
         </Paper>
-        <div className={"create-button-wrapper"}>
-          <Button variant="contained" color="primary" onClick={this.edit}>
-            Edit
-          </Button>
-          <Button
-            variant="outlined"
-            color="secondary"
-            onClick={this.props.onCancelEdit}
-          >
-            Cancel
-          </Button>
-          {this.props.deletePost && (
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={this.props.deletePost}
-            >
-              Delete
-            </Button>
-          )}
-        </div>
         <input
           type={"file"}
           hidden
@@ -173,47 +182,46 @@ export default class EditBlogPostForm extends React.Component {
           }}
         />
         <hr style={{ margin: "40px 0" }} />
-        <div>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => {
-              this.featuredImage.click();
-            }}
-          >
-            Featured Image
-          </Button>
-        </div>
         <div className={"featured-image-and-excerpt-wrapper"}>
           <span className={"featured-image-wrapper"}>
-            <>
-              <img
-                src={this.state.featuredImage}
-                alt=""
-                style={{ maxWidth: 500 }}
-              />
-              {this.state.featuredImage && (
-                <div style={{ background: "white", textAlign: "right" }}>
-                  <Button
-                    variant="contained"
-                    color="secondary"
-                    onClick={() => {
-                      this.setState({
-                        featuredImage: defaultState.featuredImage
-                      });
-                    }}
-                  >
-                    Delete
-                  </Button>
-                </div>
-              )}
-            </>
+            <div>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => {
+                  this.featuredImage.click();
+                }}
+              >
+                {this.state.featuredImage ? "Change Image" : "Featured Image"}
+              </Button>
+            </div>
+            <img
+              src={this.state.featuredImage}
+              alt=""
+              style={{ maxWidth: 500 }}
+            />
+            {this.state.featuredImage && (
+              <div style={{ background: "white", textAlign: "right" }}>
+                <Button
+                  variant="outlined"
+                  color="secondary"
+                  onClick={() => {
+                    this.setState({
+                      featuredImage: defaultState.featuredImage
+                    });
+                  }}
+                >
+                  Delete
+                </Button>
+              </div>
+            )}
           </span>
 
           <TextField
             className={"excerpt-field"}
             id="outlined-full-width"
             label="Excerpt"
+            multiline={true}
             value={this.state.excerpt}
             onChange={this.handleExcerptChange}
             placeholder={"Post Excerpt"}
@@ -225,7 +233,6 @@ export default class EditBlogPostForm extends React.Component {
           />
         </div>
         <hr style={{ margin: "40px 0" }} />
-
         <div />
       </div>
     );
