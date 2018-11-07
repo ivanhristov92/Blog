@@ -12,8 +12,14 @@ import Typography from "@material-ui/core/Typography";
 import DeletePromptDialog from "../components/delete-prompt-dialog";
 import PostPreviewGrid from "../components/post-preview-grid";
 
+import * as _ from "ramda";
+
+type State = {
+  selectedEntries: Array<number>
+};
+
 class _PostListPage extends React.Component {
-  state = {
+  state: State = {
     /* Keeps track of the selected table rows */
     selectedEntries: [],
 
@@ -45,7 +51,7 @@ class _PostListPage extends React.Component {
   };
 
   navigateToSelectedPost = () => {
-    let itemIndex = this.state.selectedEntries[0].index;
+    let itemIndex = this.state.selectedEntries[0];
     let item = this.props.allPosts[itemIndex];
     let id = item.id;
     this.navigateToPost(id);
@@ -54,7 +60,7 @@ class _PostListPage extends React.Component {
   // SELECTION
   handleRowSelectionChange = (current, allSelected) => {
     this.setState({
-      selectedEntries: allSelected
+      selectedEntries: allSelected.map(_.prop("dataIndex"))
     });
   };
 
@@ -122,7 +128,7 @@ class _PostListPage extends React.Component {
         <div id={"model-wrapper"}>
           <ModelEntriesList
             modelName={BlogPostModel.MODEL_NAME}
-            rowsSelected={this.state.selectedEntries.map(s => s.index)}
+            rowsSelected={this.state.selectedEntries}
             fields={fields}
             data={data}
             onRowsSelect={this.handleRowSelectionChange}
@@ -189,7 +195,7 @@ class _PostListPage extends React.Component {
   // Helper methods /////
 
   mapSelectedToEntries = () => {
-    return this.state.selectedEntries.map(({ index }) => {
+    return this.state.selectedEntries.map(index => {
       return this.props.allPosts[index];
     });
   };
