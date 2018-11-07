@@ -6,19 +6,42 @@ import EditBlogPostForm from "../components/edit-post-form";
 import connect from "react-redux/es/connect/connect";
 import { bindActionCreators } from "redux";
 import { fromJSONToPlain } from "../components/rich-text/serializers";
-
 import Typography from "@material-ui/core/Typography";
-
 import DeletePromptDialog from "../components/delete-prompt-dialog";
 import PostPreviewGrid from "../components/post-preview-grid";
 
 import * as _ from "ramda";
 
+import type { Props as EntryListProps } from "../components/model-entries-list";
+
+type SlateContentInJSON = string;
+
+type AdaptedPostFromServer = {
+  title: string,
+  content: SlateContentInJSON,
+  excerpt: string,
+  featuredImage: string,
+  id: number
+};
+
 type State = {
-  selectedEntries: Array<number>
+  selectedEntries: Array<number>,
+  bulkEditSectionOpen: boolean,
+  previewGridSectionOpen: boolean,
+  bulkDeleteInitiated: boolean
+};
+
+type Props = {
+  allPosts: Array<AdaptedPostFromServer>,
+  readPosts: Function,
+  updatePosts: Function,
+  deletePosts: Function,
+  history: Object
 };
 
 class _PostListPage extends React.Component {
+  props: Props;
+
   state: State = {
     /* Keeps track of the selected table rows */
     selectedEntries: [],
@@ -121,7 +144,7 @@ class _PostListPage extends React.Component {
 
   render() {
     let fields = ["id", "title", "content"];
-    let data = this.getData();
+    let data = this.adaptPostsForEntryList();
 
     return (
       <>
@@ -174,22 +197,18 @@ class _PostListPage extends React.Component {
     );
   }
 
-  getData = () => {
+  adaptPostsForEntryList = (): typeof EntryListProps.entries => {
     let fields = ["id", "title", "content"];
 
-    let data = this.props.allPosts.map(
-      compose(
-        values,
-        obj => {
-          return {
-            ...obj,
-            content: fromJSONToPlain(obj.content)
-          };
-        },
-        pick(fields)
+    let transform = _.map(
+      _.compose(
+        _.values,
+        _.evolve({ content: fromJSONToPlain }),
+        _.pick(fields)
       )
     );
-    return data;
+
+    return transform(this.props.allPosts);
   };
 
   // Helper methods /////

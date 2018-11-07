@@ -1,10 +1,11 @@
+// @flow
+
 import React from "react";
 import MUIDataTable from "mui-datatables";
 import DeleteIcon from "@material-ui/icons/Delete";
 import EditIcon from "@material-ui/icons/Edit";
 import IconButton from "@material-ui/core/IconButton";
 import Tooltip from "@material-ui/core/Tooltip";
-import { equals } from "ramda";
 import Button from "@material-ui/core/Button/Button";
 import AddIcon from "@material-ui/icons/Add";
 import VisibilityIcon from "@material-ui/icons/Visibility";
@@ -12,7 +13,17 @@ import CancelIcon from "@material-ui/icons/Cancel";
 import VisibilityOffIcon from "@material-ui/icons/VisibilityOff";
 import { Link } from "react-router-dom";
 
+type Id = number;
+type Title = string;
+type Content = string;
+
+export type Props = {
+  entries: Array<Array<Id & Title & Content>>
+};
+
 export default class ModelEntriesList extends React.Component {
+  props: Props;
+
   render() {
     const options = {
       filterType: "checkbox",
