@@ -32,13 +32,17 @@ export default class ModelEntriesList extends React.Component {
         <div style={{ display: "flex" }}>
           <Tooltip title={"opsa"}>
             <IconButton onClick={this.props.onPreviewClick}>
-              {this.props.preview ? <VisibilityOffIcon /> : <VisibilityIcon />}
+              {this.props.isPreview ? (
+                <VisibilityOffIcon />
+              ) : (
+                <VisibilityIcon />
+              )}
             </IconButton>
           </Tooltip>
 
-          <Tooltip title={this.props.editing ? "Cencel Editing" : "Edit"}>
+          <Tooltip title={this.props.isEditing ? "Cencel Editing" : "Edit"}>
             <IconButton onClick={this.props.onEditClicked}>
-              {this.props.editing ? <CancelIcon /> : <EditIcon />}
+              {this.props.isEditing ? <CancelIcon /> : <EditIcon />}
             </IconButton>
           </Tooltip>
 
@@ -51,14 +55,14 @@ export default class ModelEntriesList extends React.Component {
       ),
 
       customToolbar: () => (
-        <Link
-          to={this.props.createButtonLinksTo}
-          className={"add-button-wrapper"}
+        <Button
+          variant="fab"
+          color="primary"
+          aria-label="Add"
+          onClick={this.props.onCreateClicked}
         >
-          <Button variant="fab" color="primary" aria-label="Add">
-            <AddIcon />
-          </Button>
-        </Link>
+          <AddIcon />
+        </Button>
       ),
       onRowsSelect: this.props.onRowsSelect,
 
@@ -70,7 +74,6 @@ export default class ModelEntriesList extends React.Component {
     let data = this.props.data;
     let title = this.props.modelName;
 
-    console.log(this.state);
     return (
       <div className="model-list-wrapper">
         <MUIDataTable

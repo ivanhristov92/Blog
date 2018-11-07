@@ -39,7 +39,7 @@ type Props = {
   history: Object
 };
 
-const ENTRY_LIST_FIELDS = ["id", "title", "content"];
+const ENTRY_LIST_COLUMNS = ["id", "title", "content"];
 
 class _PostListPage extends React.Component {
   props: Props;
@@ -96,6 +96,10 @@ class _PostListPage extends React.Component {
     this.navigateToPost(id);
   };
 
+  navigateToNewPost = () => {
+    this.props.history.push("/posts/new");
+  };
+
   /**
    * SELECTION
    */
@@ -108,7 +112,7 @@ class _PostListPage extends React.Component {
   /**
    * PREVIEW GRID - grid view of selected posts
    */
-  togglePreview = () => {
+  togglePreviewSection = () => {
     this.setState({
       previewGridSectionOpen: !this.state.previewGridSectionOpen
     });
@@ -117,7 +121,7 @@ class _PostListPage extends React.Component {
   /**
    * EDITING
    */
-  handleEditClicked = () => {
+  navigateToPostOrToggleBulkEditSection = () => {
     if (this.state.selectedEntryIndexes.length === 1) {
       this.navigateToSelectedPost();
     } else {
@@ -168,7 +172,7 @@ class _PostListPage extends React.Component {
   render() {
     let data = this.adaptPostsForEntryList(
       this.props.allPosts,
-      ENTRY_LIST_FIELDS
+      ENTRY_LIST_COLUMNS
     );
 
     return (
@@ -176,15 +180,15 @@ class _PostListPage extends React.Component {
         <ModelEntriesList
           modelName={BlogPostModel.MODEL_NAME}
           data={data}
-          fields={ENTRY_LIST_FIELDS}
+          fields={ENTRY_LIST_COLUMNS}
           rowsSelected={this.state.selectedEntryIndexes}
-          editing={this.state.bulkEditSectionOpen}
-          createButtonLinksTo={"/posts/new"}
-          preview={this.state.previewGridSectionOpen}
+          isEditing={this.state.bulkEditSectionOpen}
+          isPreview={this.state.previewGridSectionOpen}
+          onCreateClicked={this.navigateToNewPost}
           onRowsSelect={this.handleRowSelectionChange}
-          onEditClicked={this.handleEditClicked}
+          onEditClicked={this.navigateToPostOrToggleBulkEditSection}
           onDeleteClick={this.initiateBulkDelete}
-          onPreviewClick={this.togglePreview}
+          onPreviewClick={this.togglePreviewSection}
         />
         {this.state.bulkEditSectionOpen && (
           <>
