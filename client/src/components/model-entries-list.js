@@ -11,78 +11,79 @@ import AddIcon from "@material-ui/icons/Add";
 import VisibilityIcon from "@material-ui/icons/Visibility";
 import CancelIcon from "@material-ui/icons/Cancel";
 import VisibilityOffIcon from "@material-ui/icons/VisibilityOff";
-import { Link } from "react-router-dom";
 
 type Id = number;
 type Title = string;
 type Content = string;
 
 export type Props = {
-  entries: Array<Array<Id & Title & Content>>
+  title: string,
+  columns: Array<string>,
+  entries: Array<Array<Id & Title & Content>>,
+  rowsSelected: Array<number>,
+  isPreviewingActive: boolean,
+  onPreviewClicked: Function,
+  onCreateClicked: Function,
+  isEditingActive: boolean,
+  onEditClicked: Function,
+  onDeleteClicked: Function,
+  onRowsSelected: Function
 };
 
-export default class ModelEntriesList extends React.Component {
-  props: Props;
+export default class ModelEntriesList extends React.Component<Props> {
+  renderCustomToolbarSelect = () => (
+    <div style={{ display: "flex" }}>
+      <Tooltip title={"Preview"}>
+        <IconButton onClick={this.props.onPreviewClicked}>
+          {this.props.isPreviewingActive ? (
+            <VisibilityOffIcon />
+          ) : (
+            <VisibilityIcon />
+          )}
+        </IconButton>
+      </Tooltip>
+
+      <Tooltip title={this.props.isEditingActive ? "Cencel Editing" : "Edit"}>
+        <IconButton onClick={this.props.onEditClicked}>
+          {this.props.isEditingActive ? <CancelIcon /> : <EditIcon />}
+        </IconButton>
+      </Tooltip>
+
+      <Tooltip title={"Delete"}>
+        <IconButton onClick={this.props.onDeleteClicked}>
+          <DeleteIcon />
+        </IconButton>
+      </Tooltip>
+    </div>
+  );
+
+  renderCustomToolbar = () => (
+    <Button
+      variant="fab"
+      color="primary"
+      aria-label="Add"
+      onClick={this.props.onCreateClicked}
+    >
+      <AddIcon />
+    </Button>
+  );
 
   render() {
     const options = {
       filterType: "checkbox",
       sort: true,
-      customToolbarSelect: () => (
-        <div style={{ display: "flex" }}>
-          <Tooltip title={"opsa"}>
-            <IconButton onClick={this.props.onPreviewClick}>
-              {this.props.isPreview ? (
-                <VisibilityOffIcon />
-              ) : (
-                <VisibilityIcon />
-              )}
-            </IconButton>
-          </Tooltip>
-
-          <Tooltip title={this.props.isEditing ? "Cencel Editing" : "Edit"}>
-            <IconButton onClick={this.props.onEditClicked}>
-              {this.props.isEditing ? <CancelIcon /> : <EditIcon />}
-            </IconButton>
-          </Tooltip>
-
-          <Tooltip title={"opsa"}>
-            <IconButton onClick={this.props.onDeleteClick}>
-              <DeleteIcon />
-            </IconButton>
-          </Tooltip>
-        </div>
-      ),
-
-      customToolbar: () => (
-        <Button
-          variant="fab"
-          color="primary"
-          aria-label="Add"
-          onClick={this.props.onCreateClicked}
-        >
-          <AddIcon />
-        </Button>
-      ),
-      onRowsSelect: this.props.onRowsSelect,
-
-      onRowsDelete: this.props.onRowDelete,
+      customToolbarSelect: this.renderCustomToolbarSelect,
+      customToolbar: this.renderCustomToolbar,
+      onRowsSelect: this.props.onRowsSelected,
       rowsSelected: this.props.rowsSelected
     };
-
-    let columns = this.props.fields;
-    let data = this.props.data;
-    let title = this.props.modelName;
 
     return (
       <div className="model-list-wrapper">
         <MUIDataTable
-          ref={table => {
-            this.table = table;
-          }}
-          title={title}
-          data={data}
-          columns={columns}
+          title={this.props.title}
+          data={this.props.entries}
+          columns={this.props.columns}
           options={options}
         />
       </div>

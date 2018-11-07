@@ -170,7 +170,7 @@ class _PostListPage extends React.Component<Props, State> {
    * RENDER
    */
   render() {
-    let data = this.adaptPostsForEntryList(
+    let entriesForList = this.adaptPostsForEntryList(
       this.props.allPosts,
       ENTRY_LIST_COLUMNS
     );
@@ -178,17 +178,17 @@ class _PostListPage extends React.Component<Props, State> {
     return (
       <div className={"page-container"}>
         <ModelEntriesList
-          modelName={BlogPostModel.MODEL_NAME}
-          data={data}
-          fields={ENTRY_LIST_COLUMNS}
+          title={BlogPostModel.MODEL_NAME}
+          entries={entriesForList}
+          columns={ENTRY_LIST_COLUMNS}
           rowsSelected={this.state.selectedEntryIndexes}
-          isEditing={this.state.bulkEditSectionOpen}
-          isPreview={this.state.previewGridSectionOpen}
+          isEditingActive={this.state.bulkEditSectionOpen}
+          isPreviewingActive={this.state.previewGridSectionOpen}
           onCreateClicked={this.navigateToNewPost}
-          onRowsSelect={this.handleRowSelectionChange}
+          onRowsSelected={this.handleRowSelectionChange}
           onEditClicked={this.navigateToPostOrToggleBulkEditSection}
-          onDeleteClick={this.initiateBulkDelete}
-          onPreviewClick={this.togglePreviewSection}
+          onDeleteClicked={this.initiateBulkDelete}
+          onPreviewClicked={this.togglePreviewSection}
         />
         {this.state.bulkEditSectionOpen && (
           <>
