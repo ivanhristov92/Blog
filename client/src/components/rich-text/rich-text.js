@@ -1,5 +1,5 @@
 import { Editor, getEventRange, getEventTransfer } from "slate-react";
-import "./rich-text.css";
+import "../../styles/rich-text.css";
 
 import React from "react";
 import { isKeyHotkey } from "is-hotkey";
@@ -14,8 +14,6 @@ import FormatListNumberedIcon from "@material-ui/icons/FormatListNumbered";
 import FormatListBulletedIcon from "@material-ui/icons/FormatListBulleted";
 import ImageIcon from "@material-ui/icons/Image";
 import VideoLibraryIcon from "@material-ui/icons/VideoLibrary";
-import FormatAlignLeftIcon from "@material-ui/icons/FormatAlignLeft";
-import FormatAlignCenterIcon from "@material-ui/icons/FormatAlignCenter";
 import FormatAlignRightIcon from "@material-ui/icons/FormatAlignRight";
 import styled from "react-emotion";
 import imageExtensions from "image-extensions";
@@ -174,7 +172,7 @@ class RichTextExample extends React.Component {
 
   render() {
     return (
-      <div class="rich-text-wrapper">
+      <div className="rich-text-wrapper">
         <input
           type={"file"}
           hidden
@@ -204,7 +202,6 @@ class RichTextExample extends React.Component {
           {this.renderMarkButton("italic", <FormatItalicIcon />)}
           {this.renderMarkButton("underlined", <FormatUnderlinedIcon />)}
           {this.renderMarkButton("code", <CodeIcon />)}
-          {this.renderMarkButton("format-right", <FormatAlignRightIcon />)}
 
           {this.renderBlockButton("heading-one", <LooksOneIcon />)}
           {this.renderBlockButton("heading-two", <LooksTwoIcon />)}

@@ -1,0 +1,51 @@
+.rich-text-wrapper {
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif; }
+  .rich-text-wrapper .toolbar {
+    border-bottom: 2px solid #eee;
+    padding: 10px; }
+  .rich-text-wrapper .editor {
+    padding: 20px;
+    min-height: 300px; }
+    .rich-text-wrapper .editor p {
+      margin: 0; }
+    .rich-text-wrapper .editor pre {
+      padding: 10px;
+      background-color: #eee;
+      white-space: pre-wrap; }
+    .rich-text-wrapper .editor :not(pre) > code {
+      background-color: #eee;
+      padding: 3px; }
+    .rich-text-wrapper .editor img {
+      max-width: 100%;
+      max-height: 20em; }
+    .rich-text-wrapper .editor blockquote {
+      border-left: 2px solid #ddd;
+      margin-left: 0;
+      margin-right: 0;
+      padding-left: 10px;
+      color: #aaa;
+      font-style: italic; }
+    .rich-text-wrapper .editor blockquote[dir='rtl'] {
+      border-left: none;
+      padding-left: 0;
+      padding-right: 10px;
+      border-right: 2px solid #ddd; }
+    .rich-text-wrapper .editor table {
+      border-collapse: collapse; }
+    .rich-text-wrapper .editor td {
+      padding: 10px;
+      border: 2px solid #ddd; }
+  .rich-text-wrapper input {
+    box-sizing: border-box;
+    font-size: 0.85em;
+    width: 100%;
+    padding: 0.5em;
+    border: 2px solid #ddd;
+    background: #fafafa; }
+  .rich-text-wrapper input:focus {
+    outline: 0;
+    border-color: blue; }
+  .rich-text-wrapper [data-slate-editor] > * + * {
+    margin-top: 1em; }
+
+/*# sourceMappingURL=rich-text.css.map */

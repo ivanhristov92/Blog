@@ -189,7 +189,7 @@ export default class EditBlogPostForm extends React.Component<Props, State> {
           }}
           onChange={this.handleFeaturedImageChange}
         />
-        <hr style={{ margin: "40px 0" }} />
+        <hr />
         <div className={"featured-image-and-excerpt-wrapper"}>
           <span className={"featured-image-wrapper"}>
             <div>
@@ -201,13 +201,9 @@ export default class EditBlogPostForm extends React.Component<Props, State> {
                 {this.state.featuredImage ? "Change Image" : "Featured Image"}
               </Button>
             </div>
-            <img
-              src={this.state.featuredImage || "/" + placeholder}
-              alt=""
-              style={{ maxWidth: 500 }}
-            />
+            <img src={this.state.featuredImage || "/" + placeholder} alt="" />
             {this.state.featuredImage && (
-              <div style={{ background: "white", textAlign: "right" }}>
+              <div className={"delete-button-wrapper"}>
                 <Button
                   variant="outlined"
                   color="secondary"
@@ -219,7 +215,7 @@ export default class EditBlogPostForm extends React.Component<Props, State> {
             )}
           </span>
           <div className={"excerpt-field-wrapper"}>
-            <div style={{ height: 36 }} />
+            <div className={"equalizing-empty-element"} />
             <TextField
               id="outlined-full-width"
               className={"excerpt-field"}
@@ -236,7 +232,7 @@ export default class EditBlogPostForm extends React.Component<Props, State> {
             />
           </div>
         </div>
-        <hr style={{ margin: "40px 0" }} />
+        <hr />
         <div />
       </div>
     );

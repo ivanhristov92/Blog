@@ -19,6 +19,10 @@ body {
 
 .new-post-form-wrapper, .edit-post-form-wrapper {
     padding: 20px;
+
+    hr {
+        margin: 40px 0;
+    }
 }
 
 .model-list-wrapper {
@@ -98,37 +102,44 @@ input {
     display: flex;
     align-items: end;
     justify-content: space-between;
+
+
+    .featured-image-wrapper {
+        display: inline-block;
+        width: 500px;
+
+        img {
+            width: 500px;
+            min-height: 300px;
+            display: inline-block;
+            box-shadow:0 0 0 3px rgba(211, 211, 211, 0.16);
+            max-width: 500px;
+        }
+
+        .delete-button-wrapper {
+            background: white;
+            text-align: right;
+        }
+    }
+
+
+    .excerpt-field-wrapper {
+        width: calc(100% - 540px);
+        margin-top: 0px !important;
+
+        .equalizing-empty-element{
+            height: 36px;
+        }
+
+        .excerpt-field {
+            width: 100%;
+            margin-top: 0px !important;
+        }
+    }
+
 }
 
-.featured-image-wrapper {
-    display: inline-block;
-    width: 500px;
-}
 
-.featured-image-wrapper img {
-    width: 500px;
-    min-height: 300px;
-    display: inline-block;
-    box-shadow:0 0 0 3px rgba(211, 211, 211, 0.16);
-}
-
-.excerpt-field-wrapper {
-    width: calc(100% - 540px);
-     margin-top: 0px !important;
-}
-
-.excerpt-field {
-    width: 100%;
-     margin-top: 0px !important;
-}
-
-.excerpt-wrapper {
-
-}
-
-.editor {
-    min-height: 300px;
-}
 
 .custom-toolbar-select-wrapper {
     display: flex;
