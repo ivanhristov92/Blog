@@ -16,27 +16,37 @@ type Id = number;
 type Title = string;
 type Content = string;
 
-export type Props = {
-  title: string,
-  columns: Array<string>,
-  entries: Array<Array<Id & Title & Content>>,
-  rowsSelected: Array<number>,
+type CustomToolbarRelatedProps = {
   isPreviewingActive: boolean,
   onPreviewClicked: Function,
-  onCreateClicked: Function,
   isEditingActive: boolean,
   onEditClicked: Function,
   onDeleteClicked: Function,
+  onCreateClicked: Function
+};
+
+type DataAndSelectionRelatedProps = {
+  columns: Array<string>,
+  entries: Array<Array<Id & Title & Content>>,
+  rowsSelected: Array<number>,
   onRowsSelected: Function
 };
 
+export type Props = {
+  title: string
+} & DataAndSelectionRelatedProps &
+  CustomToolbarRelatedProps;
+
 export default class ModelEntriesList extends React.Component<Props> {
   render() {
+    /**
+     * Custom options for MUIDataTable
+     */
     const options = {
       filterType: "checkbox",
       sort: true,
       customToolbarSelect: this.renderCustomToolbarSelect,
-      customToolbar: this.renderCustomToolbar,
+      customToolbar: this.renderInToolbar,
       onRowsSelect: this.props.onRowsSelected,
       rowsSelected: this.props.rowsSelected
     };
@@ -53,6 +63,9 @@ export default class ModelEntriesList extends React.Component<Props> {
     );
   }
 
+  /**
+   * Renders 'preview', 'and' and 'delete' controls
+   */
   renderCustomToolbarSelect = () => (
     <div className={"custom-toolbar-select-wrapper"}>
       <Tooltip title={"Preview"}>
@@ -79,7 +92,10 @@ export default class ModelEntriesList extends React.Component<Props> {
     </div>
   );
 
-  renderCustomToolbar = () => (
+  /**
+   * Adds controls to the toolbar
+   */
+  renderInToolbar = () => (
     <Button
       variant="fab"
       color="primary"

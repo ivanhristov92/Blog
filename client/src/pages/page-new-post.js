@@ -4,10 +4,20 @@ import connect from "react-redux/es/connect/connect";
 import BlogPostModel from "../model-blog-post/model-blog-post";
 import { bindActionCreators } from "redux";
 
-class _NewPostPage extends React.Component {
+type Props = {
+  postsError: ?Error,
+  stateOfCreate: string,
+  createPost: Function,
+  history: Object
+};
+
+class _NewPostPage extends React.Component<Props> {
+  /**
+   * On successful create, navigate to 'home'
+   */
   componentDidUpdate(prevProps) {
-    if (this.props.createState !== prevProps.createState) {
-      if (this.props.createState === "SUCCESS") {
+    if (this.props.stateOfCreate !== prevProps.stateOfCreate) {
+      if (this.props.stateOfCreate === "SUCCESS") {
         this.props.history.push("/");
       }
     }
@@ -24,11 +34,16 @@ class _NewPostPage extends React.Component {
     );
   }
 }
+
+/**
+ * Connect With Redux
+ */
+
 const NewPostPage = connect(
   function mapStateToProps(state) {
     return {
       postsError: BlogPostModel.selectors.getError(state),
-      createState: BlogPostModel.selectors.getOperationStates(state).create
+      stateOfCreate: BlogPostModel.selectors.getOperationStates(state).create
     };
   },
   function mapDispatchToProps(dispatch) {
