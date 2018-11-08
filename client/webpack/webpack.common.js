@@ -9,9 +9,11 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.(js|jsx)$/,
+        test: /\.(js|jsx|flow\.js)$/,
         loader: "babel-loader",
-        exclude: /(node_modules)/
+        options: {
+          presets: ["@babel/preset-flow"]
+        }
       },
       {
         test: /\.(png|jpg|gif|svg)$/,

@@ -1,139 +1,127 @@
+// @flow
 import superagent from "superagent";
-import { normalize, schema } from "normalizr";
-
-import { pathOr } from "ramda";
-
+import * as _ from "ramda";
+import type { RMLRestClientInstance } from "redux-manager-lib/crud-rest-api.flow";
+import * as adapters from "./rest-client-adapters-blog-post";
 const ROOT = "http://localhost:3000";
 
-const post = new schema.Entity(
-  "post",
-  {},
-  {
-    // Optional. Just to show where data transformation
-    // can be done
-    processStrategy: (entity, parent, key) => {
-      return {
-        title: entity.title,
-        content: JSON.parse(entity.content),
-        id: entity.id,
-        featuredImage: entity.featuredImage,
-        excerpt: entity.excerpt
-      };
-    }
-  }
-);
-const arrayOfPosts = [post];
+/**
+ * Creating
+ */
 
-export default {
-  create(payload) {
-    return superagent
-      .post(ROOT + "/posts")
-      .send(payload)
-      .then(response => {
-        return shape(response);
-      })
-      .catch(function(response) {
-        let adaptedError = adaptErrorForReact(response);
-        return Promise.reject(adaptedError);
-      });
-    function shape(response) {
-      const normalizedData = normalize(response.body, post);
-      return { byId: normalizedData.entities.post };
-    }
-  },
-  read(id) {
-    if (id) {
-      return superagent.get(ROOT + "/posts/" + id).then(response => {
-        const normalizedData = normalize(response.body, post);
-        return {
-          byId: normalizedData.entities.post
-        };
-      });
-    }
-
-    return superagent.get(ROOT + "/posts").then(response => {
-      return shape(response);
-    });
-    function shape(response) {
-      const normalizedData = normalize(response.body, arrayOfPosts);
-      return {
-        byId: normalizedData.entities.post
-      };
-    }
-  },
-  update(entry) {
-    if (Array.isArray(entry)) {
-      return Promise.all(
-        entry.map(ent => {
-          return superagent.patch(ROOT + "/posts/" + ent.id).send(ent);
-        })
+const create: $PropertyType<RMLRestClientInstance, "create"> = function create(
+  payload
+) {
+  return superagent
+    .post(ROOT + "/posts")
+    .send(payload)
+    .then(adapters.normalizeAndWrapOne)
+    .catch(
+      _.pipe(
+        adapters.adaptErrorForReact,
+        Promise.reject
       )
-        .then(responses => {
-          let byId = entry.reduce((acc, ent) => {
-            return {
-              ...acc,
-              [ent.id]: ent
-            };
-          }, {});
-
-          return {
-            byId
-          };
-        })
-        .catch(error => {
-          return Promise.reject(adaptErrorForReact(error));
-        });
-    }
-
-    return superagent
-      .patch(ROOT + "/posts/" + entry.id)
-      .send(entry)
-      .then(response => {
-        return {
-          byId: {
-            [entry.id]: entry
-          }
-        };
-      })
-      .catch(error => {
-        return Promise.reject(adaptErrorForReact(error));
-      });
-  },
-
-  delete(ids) {
-    if (Array.isArray(ids)) {
-      return Promise.all(
-        ids.map(id => {
-          return superagent.del(ROOT + `/posts/${id}`);
-        })
-      ).then((...responses) => {
-        return {
-          ids: ids
-        };
-      });
-    }
-
-    return superagent.del(ROOT + `/posts/${ids}`).then(() => {
-      let id = ids;
-      return { id };
-    });
-  }
+    );
 };
 
-function adaptErrorForReact(error) {
-  if (
-    pathOr("", ["response", "body", "error", "name"], error) ===
-    "ValidationError"
-  ) {
-    let messages = pathOr(
-      "",
-      ["response", "body", "error", "details", "messages"],
-      error
-    );
+/**
+ * Reading
+ */
+
+const readOne = function(id) {
+  return superagent
+    .get(`$PROOT}/posts/${id}`)
+    .then(adapters.normalizeAndWrapOne);
+};
+
+const readAll = function readAll() {
+  return superagent.get(`${ROOT}/posts`).then(adapters.normalizeAndWrapMany);
+};
+
+const read: $PropertyType<RMLRestClientInstance, "read"> = function read(id) {
+  return id ? readOne(id) : readAll();
+};
+
+/**
+ * Updating
+ */
+
+function updateSome(entries) {
+  return Promise.all(
+    entries.map(ent => {
+      return superagent.patch(`${ROOT}/posts/${ent.id}`).send(ent);
+    })
+  ).then(() => {
+    let byId = entries.reduce((acc, ent) => {
+      return _.assoc(ent.id, ent, acc);
+    }, {});
+
     return {
-      error: error,
-      messages
+      byId
     };
-  }
-  return error;
+  });
 }
+
+function updateOne(entry) {
+  return superagent
+    .patch(`${ROOT}/posts/${entry.id}`)
+    .send(entry)
+    .then(() => {
+      return {
+        byId: {
+          [entry.id]: entry
+        }
+      };
+    });
+}
+
+const update: $PropertyType<RMLRestClientInstance, "update"> = function update(
+  entry
+) {
+  let promise = Array.isArray(entry) ? updateSome(entry) : updateOne(entry);
+  return promise.catch(error => {
+    return Promise.reject(adapters.adaptErrorForReact(error));
+  });
+};
+
+/**
+ * Deleting
+ */
+
+function deleteSome(ids) {
+  return Promise.all(
+    ids.map(id => {
+      return superagent.del(`${ROOT}/posts/${id}`);
+    })
+  ).then(() => {
+    return {
+      ids
+    };
+  });
+}
+
+function deleteOne(id) {
+  return superagent.del(`${ROOT}/posts/${id}`).then(() => {
+    return { id };
+  });
+}
+
+const _delete: $PropertyType<
+  RMLRestClientInstance,
+  "delete"
+> = function _delete(ids) {
+  return Array.isArray(ids) ? deleteSome(ids) : deleteOne(ids);
+};
+
+/**
+ * The Whole Client
+ */
+
+const client: RMLRestClientInstance = {
+  create,
+  read,
+  update,
+  delete: _delete
+};
+
+export default client;
