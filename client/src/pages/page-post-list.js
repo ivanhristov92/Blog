@@ -17,7 +17,7 @@ import type { Props as EntryListProps } from "../components/model-entries-list";
 
 type SlateContent = Object;
 
-type AdaptedPostFromServer = {
+export type AdaptedPostFromServer = {
   title: string,
   content: SlateContent,
   excerpt: string,
@@ -198,7 +198,7 @@ class _PostListPage extends React.Component<Props, State> {
             <EditBlogPostForm
               entries={this.state.selectedEntries}
               onCancelEdit={this.cancelBulkEdit}
-              onSubmit={this.doBulkEdit}
+              onEdit={this.doBulkEdit}
             />
           </>
         )}

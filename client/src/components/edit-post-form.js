@@ -1,6 +1,7 @@
+// @flow
+
 import React from "react";
 import TextField from "@material-ui/core/TextField";
-import Input from "@material-ui/core/Input";
 import Button from "@material-ui/core/Button";
 import { Paper } from "@material-ui/core";
 import Chip from "@material-ui/core/Chip";
@@ -10,60 +11,68 @@ import placeholder from "../images/placeholder.jpg";
 import { Prompt } from "react-router-dom";
 
 import * as _ from "ramda";
-
-const initialEditorValue = {
-  document: {
-    nodes: [
-      {
-        object: "block",
-        type: "paragraph",
-        nodes: [{ object: "text", leaves: [{ text: "" }] }]
-      }
-    ]
-  }
-};
+import type { AdaptedPostFromServer } from "../pages/page-post-list";
+import { emptyValue } from "./rich-text/serializers";
 
 const defaultState = Object.freeze({
   title: "",
-  content: Value.fromJS(initialEditorValue),
+  content: Value.fromJS(emptyValue),
   featuredImage: "",
   excerpt: ""
 });
 
-export default class EditBlogPostForm extends React.Component {
-  state = defaultState;
+type Props = {
+  entries: Array<AdaptedPostFromServer>,
+  onEdit: Function,
+  onCancelEdit: Function,
+  deletePost: Function
+};
+
+type State = {
+  title: string,
+  content: Object,
+  featuredImage: string,
+  excerpt: string
+};
+
+const getValuesOfEntry = (entry: AdaptedPostFromServer) =>
+  _.evolve({ content: Value.fromJSON }, entry);
+
+export default class EditBlogPostForm extends React.Component<Props, State> {
+  featuredImageRef: Object;
+
+  constructor(props: Props) {
+    super(props);
+
+    if (props.entries.length === 1) {
+      let entry = props.entries[0];
+      this.state = getValuesOfEntry(entry);
+    } else {
+      this.state = defaultState;
+    }
+  }
+
+  componentDidUpdate(prevProps: Props) {
+    if (this.goingToOneEntry(prevProps)) {
+      this.setStateToFirstEntry();
+    } else if (this.movingAwayFromOneEntry(prevProps)) {
+      this.setStateDefaults();
+    }
+  }
 
   setStateToFirstEntry = () => {
-    if (this.props.entries.length === 1) {
-      let entry = this.props.entries[0];
-      this.setState({
-        title: entry.title,
-        content: Value.fromJSON(JSON.parse(this.props.entries[0].content)),
-        featuredImage: entry.featuredImage,
-        excerpt: entry.excerpt
-      });
-    }
+    let entry = this.props.entries[0];
+    let valuesOfEntry = getValuesOfEntry(entry);
+    this.setState(valuesOfEntry);
   };
 
-  resetState = () => {
+  setStateDefaults = () => {
     this.setState(defaultState);
   };
 
-  componentDidMount() {
-    this.setStateToFirstEntry();
-  }
-
-  componentDidUpdate(prevProps) {
-    if (this.props.entries.length === 1 && prevProps.entries.length !== 1) {
-      this.setStateToFirstEntry();
-    } else if (
-      this.props.entries.length !== 1 &&
-      prevProps.entries.length === 1
-    ) {
-      this.resetState();
-    }
-  }
-
+  /**
+   * Change Handlers
+   */
   ///////////////////////
   // ____Rich Text______
   ///////////////////////
@@ -96,45 +105,51 @@ export default class EditBlogPostForm extends React.Component {
   // === Excerpt Field ====
   ///////////////////////
 
-  edit = () => {
-    let payload = {
-      content: JSON.stringify(this.state.content.toJSON()),
-      title: this.state.title,
-      featuredImage: this.state.featuredImage,
-      excerpt: this.state.excerpt
-    };
-    this.props.onSubmit(payload);
+  ///////////////////////
+  // Featured Image Field
+  ///////////////////////
+  handleFeaturedImageChange = e => {
+    for (const file of e.target.files) {
+      const reader = new FileReader();
+      const [mime] = file.type.split("/");
+      if (mime !== "image") continue;
+
+      reader.addEventListener("load", () => {
+        this.setState({ featuredImage: reader.result });
+      });
+
+      reader.readAsDataURL(file);
+    }
+    return;
+  };
+
+  handleFeaturedImageClicked = () => {
+    this.featuredImageRef.click();
+  };
+
+  resetFeaturedImage = () => {
+    this.setState({
+      featuredImage: defaultState.featuredImage
+    });
+  };
+  // Featured Image Field
+  ///////////////////////
+
+  doEdit = () => {
+    const formatContent = content => JSON.stringify(content.toJSON());
+    let payload = _.evolve({ content: formatContent }, this.state);
+    this.props.onEdit(payload);
   };
 
   render() {
-    const hasChanges = () => {
-      if (!this.props.entries[0]) {
-        return false;
-      }
-
-      let a = _.pick(["title", "excerpt", "featuredImage"], this.state);
-      let b = _.pick(
-        ["title", "excerpt", "featuredImage"],
-        this.props.entries[0]
-      );
-
-      let areDif = !_.equals(a, b);
-
-      let aaa = JSON.stringify(this.state.content.toJSON());
-      let bbb = this.props.entries[0].content;
-      let contentsAreDiff = !_.equals(aaa, bbb);
-
-      return areDif || contentsAreDiff;
-    };
-
     if (this.props.entries[0]) {
-      console.log("hasChanges", hasChanges());
+      console.log("hasChanges", this.entryContentHasChanged());
     }
 
     return (
       <div className="new-post-form-wrapper">
         <Prompt
-          when={hasChanges()}
+          when={this.entryContentHasChanged()}
           message={location =>
             `Are you sure you want to go to ${location.pathname}`
           }
@@ -158,14 +173,11 @@ export default class EditBlogPostForm extends React.Component {
         <Paper>
           <RichText
             onChange={this.onContentChange}
-            onKeyDown={this.onContentKeyDown}
-            renderNode={this.renderNode}
-            renderMark={this.renderMark}
             value={this.state.content}
           />
         </Paper>
         <div className={"create-button-wrapper"}>
-          <Button variant="contained" color="primary" onClick={this.edit}>
+          <Button variant="contained" color="primary" onClick={this.doEdit}>
             Edit
           </Button>
           <Button
@@ -190,22 +202,9 @@ export default class EditBlogPostForm extends React.Component {
           type={"file"}
           hidden
           ref={el => {
-            this.featuredImage = el;
+            this.featuredImageRef = el;
           }}
-          onChange={e => {
-            for (const file of e.target.files) {
-              const reader = new FileReader();
-              const [mime] = file.type.split("/");
-              if (mime !== "image") continue;
-
-              reader.addEventListener("load", () => {
-                this.setState({ featuredImage: reader.result });
-              });
-
-              reader.readAsDataURL(file);
-            }
-            return;
-          }}
+          onChange={this.handleFeaturedImageChange}
         />
         <hr style={{ margin: "40px 0" }} />
         <div className={"featured-image-and-excerpt-wrapper"}>
@@ -214,9 +213,7 @@ export default class EditBlogPostForm extends React.Component {
               <Button
                 variant="contained"
                 color="primary"
-                onClick={() => {
-                  this.featuredImage.click();
-                }}
+                onClick={this.handleFeaturedImageClicked}
               >
                 {this.state.featuredImage ? "Change Image" : "Featured Image"}
               </Button>
@@ -231,11 +228,7 @@ export default class EditBlogPostForm extends React.Component {
                 <Button
                   variant="outlined"
                   color="secondary"
-                  onClick={() => {
-                    this.setState({
-                      featuredImage: defaultState.featuredImage
-                    });
-                  }}
+                  onClick={this.resetFeaturedImage}
                 >
                   Delete
                 </Button>
@@ -266,6 +259,32 @@ export default class EditBlogPostForm extends React.Component {
     );
   }
 
+  entryContentHasChanged = (() => {
+    function compareRichTextStates(state, defaultState) {
+      return !_.equals(state.content.toJSON(), defaultState.content);
+    }
+
+    function compareAllButRichTextStates(state, defaultState) {
+      let properties = ["title", "excerpt", "featuredImage"];
+      let valuesInState = _.pick(properties, state);
+      let valuesInDefaultState = _.pick(properties, defaultState);
+      return !_.equals(valuesInState, valuesInDefaultState);
+    }
+
+    return () => {
+      let firstEntry = this.props.entries[0];
+      if (!firstEntry) {
+        return false;
+      }
+      let richTextHasChanges = compareRichTextStates(this.state, firstEntry);
+      let somePropertiesHaveChanges = compareAllButRichTextStates(
+        this.state,
+        firstEntry
+      );
+      return richTextHasChanges || somePropertiesHaveChanges;
+    };
+  })();
+
   renderErrors = () => {
     if (!this.props.error) return null;
     let messages = Object.entries(this.props.error.messages || {});
@@ -290,5 +309,16 @@ export default class EditBlogPostForm extends React.Component {
   isInErrors = input => {
     if (!this.props.error) return false;
     return (this.props.error.messages || {}).hasOwnProperty(input);
+  };
+
+  /**
+   * Helpers
+   */
+  movingAwayFromOneEntry = prevProps => {
+    return this.props.entries.length !== 1 && prevProps.entries.length === 1;
+  };
+
+  goingToOneEntry = prevProps => {
+    return this.props.entries.length === 1 && prevProps.entries.length !== 1;
   };
 }

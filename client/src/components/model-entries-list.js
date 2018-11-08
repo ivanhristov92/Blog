@@ -42,11 +42,11 @@ export default class ModelEntriesList extends React.Component<Props> {
     /**
      * Custom options for MUIDataTable
      */
-    const options = {
+    const tableOptions = {
       filterType: "checkbox",
       sort: true,
       customToolbarSelect: this.renderCustomToolbarSelect,
-      customToolbar: this.renderInToolbar,
+      customToolbar: this.renderAdditionalControlsInToolbar,
       onRowsSelect: this.props.onRowsSelected,
       rowsSelected: this.props.rowsSelected
     };
@@ -57,7 +57,7 @@ export default class ModelEntriesList extends React.Component<Props> {
           title={this.props.title}
           data={this.props.entries}
           columns={this.props.columns}
-          options={options}
+          options={tableOptions}
         />
       </div>
     );
@@ -95,7 +95,7 @@ export default class ModelEntriesList extends React.Component<Props> {
   /**
    * Adds controls to the toolbar
    */
-  renderInToolbar = () => (
+  renderAdditionalControlsInToolbar = () => (
     <Button
       variant="fab"
       color="primary"

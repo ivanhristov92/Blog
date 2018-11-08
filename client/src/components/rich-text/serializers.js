@@ -221,27 +221,18 @@ const initialValue = {
 
 export { initialValue };
 
-const initialEmptyValue = {
+const emptyValue = {
   document: {
     nodes: [
       {
         object: "block",
         type: "paragraph",
-        nodes: [
-          {
-            object: "text",
-            leaves: [
-              {
-                text: ""
-              }
-            ]
-          }
-        ]
+        nodes: [{ object: "text", leaves: [{ text: "" }] }]
       }
     ]
   }
 };
-export { initialEmptyValue };
+export { emptyValue };
 
 export function fromJSONToPlain(content) {
   return Plain.serialize(Value.fromJSON(content));

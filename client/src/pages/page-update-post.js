@@ -29,7 +29,7 @@ class _PostDetailsPage extends React.Component {
         onCancelEdit={() => {
           this.props.history.push("/");
         }}
-        onSubmit={payload => {
+        onEdit={payload => {
           this.props.updatePost({
             ...payload,
             id: Number(this.props.match.params.id)
