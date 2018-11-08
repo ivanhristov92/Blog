@@ -45,7 +45,7 @@ const getValuesOfEntry = (entry: AdaptedPostFromServer) =>
   _.evolve({ content: Value.fromJSON }, entry);
 
 export default class EditBlogPostForm extends React.Component<Props, State> {
-  featuredImageRef: Object;
+  featuredImageRef: ?Object;
 
   constructor(props: Props) {
     super(props);
@@ -82,33 +82,36 @@ export default class EditBlogPostForm extends React.Component<Props, State> {
   /**
    * Rich Text
    */
-  handleContentChange = ({ value }) => {
+  handleContentChange = ({ value }: { value: Value }) => {
     this.setState({ content: value });
   };
 
   /**
    * Title
    */
-  handleTitleChange = e => {
+  handleTitleChange = (e: SyntheticEvent<HTMLInputElement>) => {
+    (e.currentTarget: HTMLInputElement);
     this.setState({
-      title: e.target.value
+      title: e.currentTarget.value
     });
   };
 
   /**
    * Excerpt
    */
-  handleExcerptChange = e => {
+  handleExcerptChange = (e: SyntheticEvent<HTMLInputElement>) => {
+    (e.currentTarget: HTMLInputElement);
     this.setState({
-      excerpt: e.target.value
+      excerpt: e.currentTarget.value
     });
   };
 
   /**
    * Featured Image
    */
-  handleFeaturedImageChange = e => {
-    for (const file of e.target.files) {
+  handleFeaturedImageChange = (e: SyntheticEvent<HTMLInputElement>) => {
+    (e.currentTarget: HTMLInputElement);
+    for (const file of e.currentTarget.files) {
       const reader = new FileReader();
       const [mime] = file.type.split("/");
       if (mime !== "image") continue;
@@ -291,19 +294,19 @@ export default class EditBlogPostForm extends React.Component<Props, State> {
     });
   };
 
-  isInErrors = input => {
+  isInErrors = (inputName: string) => {
     if (!this.props.error) return false;
-    return (this.props.error.messages || {}).hasOwnProperty(input);
+    return (this.props.error.messages || {}).hasOwnProperty(inputName);
   };
 
   /**
    * Helpers
    */
-  movingAwayFromOneEntry = prevProps => {
+  movingAwayFromOneEntry = (prevProps: Props) => {
     return this.props.entries.length !== 1 && prevProps.entries.length === 1;
   };
 
-  goingToOneEntry = prevProps => {
+  goingToOneEntry = (prevProps: Props) => {
     return this.props.entries.length === 1 && prevProps.entries.length !== 1;
   };
 }

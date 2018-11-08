@@ -1,3 +1,4 @@
+// @flow
 import React from "react";
 import NewBlogPostForm from "../components/new-post-form";
 import connect from "react-redux/es/connect/connect";
@@ -26,10 +27,11 @@ class _NewPostPage extends React.Component<Props> {
   render() {
     return (
       <NewBlogPostForm
-        onSubmit={this.props.createPost}
-        onCancel={() => {
+        createPost={this.props.createPost}
+        cancelCreating={() => {
           this.props.history.push("/");
         }}
+        stateOfCreate={this.props.stateOfCreate}
       />
     );
   }

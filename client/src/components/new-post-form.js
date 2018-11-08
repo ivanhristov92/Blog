@@ -1,3 +1,5 @@
+// @flow
+
 import React from "react";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
@@ -9,6 +11,26 @@ import { sampleValue } from "./rich-text/serializers";
 import { Prompt } from "react-router-dom";
 import * as _ from "ramda";
 import placeholder from "../images/placeholder.jpg";
+import type { AdaptedPostFromServer } from "../pages/page-post-list";
+
+type AdaptedError = {
+  error: Object,
+  messages: { [fieldName: string]: Array<string> }
+};
+
+type Props = {
+  createPost: Function,
+  cancelCreating: Function,
+  error?: ?AdaptedError,
+  stateOfCreate: string
+};
+
+type State = {
+  title: string,
+  content: Object,
+  featuredImage: string,
+  excerpt: string
+};
 
 const defaultState: State = Object.freeze({
   title: "",
@@ -17,12 +39,14 @@ const defaultState: State = Object.freeze({
   excerpt: ""
 });
 
-export default class NewBlogPostForm extends React.Component {
+export default class NewBlogPostForm extends React.Component<Props, State> {
+  featuredImageRef: Object;
+
   state = defaultState;
 
-  componentDidUpdate(prevProps) {
-    if (prevProps.createState !== this.props.createState) {
-      if (this.props.createState === "SUCCESS") {
+  componentDidUpdate(prevProps: Props) {
+    if (prevProps.stateOfCreate !== this.props.stateOfCreate) {
+      if (this.props.stateOfCreate === "SUCCESS") {
         this.setStateDefaults();
       }
     }
@@ -34,31 +58,35 @@ export default class NewBlogPostForm extends React.Component {
   /**
    * Rich Text
    */
-  handleContentChange = ({ value }) => {
+  handleContentChange = ({ value }: { value: Value }) => {
     this.setState({ content: value });
   };
 
   /**
    * Title
    */
-  handleTitleChange = e => {
+  handleTitleChange = (e: SyntheticEvent<HTMLInputElement>) => {
+    (e.currentTarget: HTMLInputElement);
     this.setState({
-      title: e.target.value
+      title: e.currentTarget.value
     });
   };
   /**
    * Excerpt
    */
-  handleExcerptChange = e => {
+  handleExcerptChange = (e: SyntheticEvent<HTMLInputElement>) => {
+    (e.currentTarget: HTMLInputElement);
     this.setState({
-      excerpt: e.target.value
+      excerpt: e.currentTarget.value
     });
   };
   /**
    * Featured Image
    */
-  handleFeaturedImageChange = e => {
-    for (const file of e.target.files) {
+  handleFeaturedImageChange = (e: SyntheticEvent<HTMLInputElement>) => {
+    (e.currentTarget: HTMLInputElement);
+
+    for (const file of e.currentTarget.files) {
       const reader = new FileReader();
       const [mime] = file.type.split("/");
       if (mime !== "image") continue;
@@ -83,17 +111,13 @@ export default class NewBlogPostForm extends React.Component {
   /**
    * Creating
    */
-  create = () => {
+  createPost = () => {
     const formatContent = content => JSON.stringify(content.toJSON());
     let payload = _.evolve({ content: formatContent }, this.state);
-    this.props.onSubmit(payload);
+    this.props.createPost(payload);
   };
 
   render() {
-    console.log(
-      "this.entryContentHasChanged(defaultState)",
-      this.entryContentHasChanged(defaultState)
-    );
     return (
       <div className="new-post-form-wrapper">
         <Prompt
@@ -123,13 +147,13 @@ export default class NewBlogPostForm extends React.Component {
           />
         </Paper>
         <div className={"action-button-wrapper"}>
-          <Button variant="contained" color="primary" onClick={this.create}>
+          <Button variant="contained" color="primary" onClick={this.createPost}>
             Create
           </Button>
           <Button
             variant="outlined"
             color="secondary"
-            onClick={this.props.onCancel}
+            onClick={this.props.cancelCreating}
           >
             Cancel
           </Button>
@@ -221,7 +245,7 @@ export default class NewBlogPostForm extends React.Component {
    */
   entryContentHasChanged = (() => {
     function compareRichTextStates(state, defaultState) {
-      return !_.equals(state.content.toJSON(), defaultState.content);
+      return !_.equals(state.content.toJSON(), defaultState.content.toJSON());
     }
 
     function compareAllButRichTextStates(state, defaultState) {
@@ -232,7 +256,7 @@ export default class NewBlogPostForm extends React.Component {
     }
 
     return defaultEntry => {
-      if (!defaultEntry) {
+      if (!defaultEntry || !this.state) {
         return false;
       }
       let richTextHasChanges = compareRichTextStates(this.state, defaultEntry);
