@@ -52,7 +52,7 @@ export default class ModelEntriesList extends React.Component<Props> {
     };
 
     return (
-      <div className="model-list-wrapper">
+      <div className="entry-table-wrapper">
         <MUIDataTable
           title={this.props.title}
           data={this.props.entries}

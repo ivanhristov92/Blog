@@ -101,7 +101,7 @@ export default class NewBlogPostForm extends React.Component {
           }
         />
 
-        <div className={"new-post-title-wrapper"}>
+        <div className={"post-title-wrapper"}>
           <TextField
             id="outlined-full-width"
             label="Post Title"
@@ -125,7 +125,7 @@ export default class NewBlogPostForm extends React.Component {
             value={this.state.content}
           />
         </Paper>
-        <div className={"create-button-wrapper"}>
+        <div className={"action-button-wrapper"}>
           <Button variant="contained" color="primary" onClick={this.create}>
             Create
           </Button>
@@ -227,7 +227,7 @@ export default class NewBlogPostForm extends React.Component {
 
     return messages.map(([key, list]) => {
       return (
-        <div className={"error-messages-wrapper"}>
+        <div>
           {list.map(l => {
             return (
               <Chip

@@ -25,10 +25,7 @@ function ImgMediaCard(props) {
             {props.title}
           </Typography>
           <Typography component="p">
-            <div
-              dangerouslySetInnerHTML={{ __html: props.excerpt }}
-              className={"excerpt-wrapper"}
-            />
+            <div dangerouslySetInnerHTML={{ __html: props.excerpt }} />
           </Typography>
         </CardContent>
       </CardActionArea>

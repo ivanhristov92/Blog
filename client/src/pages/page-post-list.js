@@ -176,7 +176,7 @@ class _PostListPage extends React.Component<Props, State> {
     );
 
     return (
-      <div className={"page-container"}>
+      <div className={"page-container post-list-page-wrapper"}>
         <ModelEntriesList
           title={BlogPostModel.MODEL_NAME}
           entries={entriesForList}

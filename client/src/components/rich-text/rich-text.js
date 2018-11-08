@@ -14,7 +14,6 @@ import FormatListNumberedIcon from "@material-ui/icons/FormatListNumbered";
 import FormatListBulletedIcon from "@material-ui/icons/FormatListBulleted";
 import ImageIcon from "@material-ui/icons/Image";
 import VideoLibraryIcon from "@material-ui/icons/VideoLibrary";
-import FormatAlignRightIcon from "@material-ui/icons/FormatAlignRight";
 import styled from "react-emotion";
 import imageExtensions from "image-extensions";
 import { Block } from "slate";

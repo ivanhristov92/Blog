@@ -14,11 +14,17 @@ import * as _ from "ramda";
 import type { AdaptedPostFromServer } from "../pages/page-post-list";
 import { emptyValue } from "./rich-text/serializers";
 
+type AdaptedError = {
+  error: Object,
+  messages: { [fieldName: string]: Array<string> }
+};
+
 type Props = {
   entries: Array<AdaptedPostFromServer>,
   updatePost: Function,
   cancelEditing: Function,
-  deletePost: Function
+  deletePost?: Function,
+  error?: ?AdaptedError
 };
 
 type State = {
@@ -135,10 +141,10 @@ export default class EditBlogPostForm extends React.Component<Props, State> {
 
   render() {
     return (
-      <div className="new-post-form-wrapper">
+      <div className="edit-post-form-wrapper">
         <Prompt when={this.entryContentHasChanged()} message={location => {}} />
 
-        <div className={"new-post-title-wrapper"}>
+        <div className={"post-title-wrapper"}>
           <TextField
             id="outlined-full-width"
             label="Post Title"
@@ -159,7 +165,7 @@ export default class EditBlogPostForm extends React.Component<Props, State> {
             value={this.state.content}
           />
         </Paper>
-        <div className={"create-button-wrapper"}>
+        <div className={"action-button-wrapper"}>
           <Button variant="contained" color="primary" onClick={this.updatePost}>
             Edit
           </Button>
