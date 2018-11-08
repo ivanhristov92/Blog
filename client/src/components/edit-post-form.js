@@ -14,17 +14,10 @@ import * as _ from "ramda";
 import type { AdaptedPostFromServer } from "../pages/page-post-list";
 import { emptyValue } from "./rich-text/serializers";
 
-const defaultState = Object.freeze({
-  title: "",
-  content: Value.fromJS(emptyValue),
-  featuredImage: "",
-  excerpt: ""
-});
-
 type Props = {
   entries: Array<AdaptedPostFromServer>,
-  onEdit: Function,
-  onCancelEdit: Function,
+  updatePost: Function,
+  cancelEditing: Function,
   deletePost: Function
 };
 
@@ -34,6 +27,13 @@ type State = {
   featuredImage: string,
   excerpt: string
 };
+
+const defaultState: State = Object.freeze({
+  title: "",
+  content: Value.fromJS(emptyValue),
+  featuredImage: "",
+  excerpt: ""
+});
 
 const getValuesOfEntry = (entry: AdaptedPostFromServer) =>
   _.evolve({ content: Value.fromJSON }, entry);
@@ -60,6 +60,9 @@ export default class EditBlogPostForm extends React.Component<Props, State> {
     }
   }
 
+  /**
+   * Syncing state and first entry
+   */
   setStateToFirstEntry = () => {
     let entry = this.props.entries[0];
     let valuesOfEntry = getValuesOfEntry(entry);
@@ -71,96 +74,76 @@ export default class EditBlogPostForm extends React.Component<Props, State> {
   };
 
   /**
-   * Change Handlers
+   * Rich Text
    */
-  ///////////////////////
-  // ____Rich Text______
-  ///////////////////////
-  onContentChange = ({ value }) => {
+  handleContentChange = ({ value }) => {
     this.setState({ content: value });
   };
 
-  // ==== Rich Text ====
-  ///////////////////////
-
-  ///////////////////////
-  // ___Title Field_____
-  ///////////////////////
-  onTitleChange = e => {
+  /**
+   * Title
+   */
+  handleTitleChange = e => {
     this.setState({
       title: e.target.value
     });
   };
-  // === Title Field ====
-  ///////////////////////
 
-  ///////////////////////
-  // Excerpt Field_____
-  ///////////////////////
+  /**
+   * Excerpt
+   */
   handleExcerptChange = e => {
     this.setState({
       excerpt: e.target.value
     });
   };
-  // === Excerpt Field ====
-  ///////////////////////
 
-  ///////////////////////
-  // Featured Image Field
-  ///////////////////////
+  /**
+   * Featured Image
+   */
   handleFeaturedImageChange = e => {
     for (const file of e.target.files) {
       const reader = new FileReader();
       const [mime] = file.type.split("/");
       if (mime !== "image") continue;
-
       reader.addEventListener("load", () => {
         this.setState({ featuredImage: reader.result });
       });
 
       reader.readAsDataURL(file);
     }
-    return;
   };
 
-  handleFeaturedImageClicked = () => {
+  openImageSelectionWindow = () => {
     this.featuredImageRef.click();
   };
 
-  resetFeaturedImage = () => {
+  clearFeaturedImage = () => {
     this.setState({
       featuredImage: defaultState.featuredImage
     });
   };
-  // Featured Image Field
-  ///////////////////////
 
-  doEdit = () => {
+  /**
+   * Editing
+   */
+  updatePost = () => {
     const formatContent = content => JSON.stringify(content.toJSON());
     let payload = _.evolve({ content: formatContent }, this.state);
-    this.props.onEdit(payload);
+    this.props.updatePost(payload);
   };
 
   render() {
-    if (this.props.entries[0]) {
-      console.log("hasChanges", this.entryContentHasChanged());
-    }
-
     return (
       <div className="new-post-form-wrapper">
-        <Prompt
-          when={this.entryContentHasChanged()}
-          message={location =>
-            `Are you sure you want to go to ${location.pathname}`
-          }
-        />
+        <Prompt when={this.entryContentHasChanged()} message={location => {}} />
 
         <div className={"new-post-title-wrapper"}>
           <TextField
             id="outlined-full-width"
             label="Post Title"
             value={this.state.title}
-            onChange={this.onTitleChange}
+            onChange={this.handleTitleChange}
             placeholder={"Post Title"}
             fullWidth
             margin="normal"
@@ -172,18 +155,18 @@ export default class EditBlogPostForm extends React.Component<Props, State> {
         </div>
         <Paper>
           <RichText
-            onChange={this.onContentChange}
+            onChange={this.handleContentChange}
             value={this.state.content}
           />
         </Paper>
         <div className={"create-button-wrapper"}>
-          <Button variant="contained" color="primary" onClick={this.doEdit}>
+          <Button variant="contained" color="primary" onClick={this.updatePost}>
             Edit
           </Button>
           <Button
             variant="outlined"
             color="secondary"
-            onClick={this.props.onCancelEdit}
+            onClick={this.props.cancelEditing}
           >
             Cancel
           </Button>
@@ -213,7 +196,7 @@ export default class EditBlogPostForm extends React.Component<Props, State> {
               <Button
                 variant="contained"
                 color="primary"
-                onClick={this.handleFeaturedImageClicked}
+                onClick={this.openImageSelectionWindow}
               >
                 {this.state.featuredImage ? "Change Image" : "Featured Image"}
               </Button>
@@ -228,7 +211,7 @@ export default class EditBlogPostForm extends React.Component<Props, State> {
                 <Button
                   variant="outlined"
                   color="secondary"
-                  onClick={this.resetFeaturedImage}
+                  onClick={this.clearFeaturedImage}
                 >
                   Delete
                 </Button>

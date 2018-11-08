@@ -197,8 +197,8 @@ class _PostListPage extends React.Component<Props, State> {
             </Typography>
             <EditBlogPostForm
               entries={this.state.selectedEntries}
-              onCancelEdit={this.cancelBulkEdit}
-              onEdit={this.doBulkEdit}
+              cancelEditing={this.cancelBulkEdit}
+              updatePost={this.doBulkEdit}
             />
           </>
         )}
