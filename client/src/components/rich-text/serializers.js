@@ -110,7 +110,7 @@ const rules = [
 const html = new Html({ rules });
 export { html };
 
-const initialValue = {
+const sampleValue = {
   document: {
     nodes: [
       {
@@ -219,7 +219,7 @@ const initialValue = {
   }
 };
 
-export { initialValue };
+export { sampleValue };
 
 const emptyValue = {
   document: {
