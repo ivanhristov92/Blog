@@ -21,6 +21,8 @@ export type AdaptedPost = {
   id: number | string
 } & AdaptedPostWithoutId;
 
+export type AdaptedError = { error: Error, message: any };
+
 type AdaptedPostId = $PropertyType<AdaptedPost, "id">;
 type SlateContent = Object;
 
@@ -33,11 +35,19 @@ type SlateContent = Object;
  * RMLUpdate<ExpectsPayload, EntryShape, ErrorShape>
  * RMLDelete<ExpectsPayload, IdType, ErrorShape>
  */
-type RestClientInstance = {
-  create: RMLCreate<AdaptedPostWithoutId, AdaptedPost, Error>,
-  read: RMLRead<?AdaptedPostId, AdaptedPost, Error>,
-  update: RMLUpdate<AdaptedPost | Array<AdaptedPost>, AdaptedPost, Error>,
-  delete: RMLDelete<AdaptedPostId | Array<AdaptedPostId>, AdaptedPostId, Error>
+export type RestClientInstance = {
+  create: RMLCreate<AdaptedPostWithoutId, AdaptedPost, AdaptedError>,
+  read: RMLRead<?AdaptedPostId, AdaptedPost, AdaptedError>,
+  update: RMLUpdate<
+    AdaptedPost | Array<AdaptedPost>,
+    AdaptedPost,
+    AdaptedError
+  >,
+  delete: RMLDelete<
+    AdaptedPostId | Array<AdaptedPostId>,
+    AdaptedPostId,
+    AdaptedError
+  >
 };
 
 const ROOT = "http://localhost:3000";

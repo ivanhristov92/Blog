@@ -1,6 +1,6 @@
 import { pathOr } from "ramda";
 import { normalize, schema } from "normalizr";
-
+import type { AdaptedError } from "./rest-client-blog-post";
 /**
  * Normalization & Entry Adapter
  */
@@ -36,7 +36,7 @@ export function normalizeAndWrapMany(response) {
 /**
  * Error Adapter
  */
-export function adaptErrorForReact(error) {
+export function adaptErrorForReact(error: Error): AdaptedError {
   if (
     pathOr("", ["response", "body", "error", "name"], error) ===
     "ValidationError"

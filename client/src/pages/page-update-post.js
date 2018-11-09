@@ -1,12 +1,30 @@
+// @flow
+
 import React from "react";
 import EditBlogPostForm from "../components/edit-post-form";
 import connect from "react-redux/es/connect/connect";
 import BlogPostModel from "../model-blog-post/model-blog-post";
 import { bindActionCreators } from "redux";
+import type {
+  RestClientInstance,
+  AdaptedPost
+} from "../model-blog-post/rest-client-blog-post";
+import type { RMLOperationState } from "redux-manager-lib/crud-reducer.flow";
 
-class _PostDetailsPage extends React.Component {
+type Props = {
+  post: AdaptedPost,
+  deleteState: RMLOperationState,
+  updateState: RMLOperationState,
+  match: Object,
+  history: Object,
+
+  readPost: $PropertyType<RestClientInstance, "read">,
+  updatePost: $PropertyType<RestClientInstance, "update">,
+  deletePost: $PropertyType<RestClientInstance, "delete">
+};
+
+class _PostDetailsPage extends React.Component<Props> {
   componentWillMount() {
-    console.log(this.props.match.params.id);
     this.props.readPost(this.props.match.params.id);
   }
 
@@ -26,7 +44,7 @@ class _PostDetailsPage extends React.Component {
     return (
       <EditBlogPostForm
         entries={this.props.post ? [this.props.post] : []}
-        onCancelEdit={() => {
+        cancelEditing={() => {
           this.props.history.push("/");
         }}
         updatePost={payload => {

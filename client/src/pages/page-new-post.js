@@ -4,11 +4,16 @@ import NewBlogPostForm from "../components/new-post-form";
 import connect from "react-redux/es/connect/connect";
 import BlogPostModel from "../model-blog-post/model-blog-post";
 import { bindActionCreators } from "redux";
+import type { RMLOperationState } from "redux-manager-lib/crud-reducer.flow";
+import type {
+  RestClientInstance,
+  AdaptedError
+} from "../model-blog-post/rest-client-blog-post";
 
 type Props = {
-  postsError: ?Error,
-  stateOfCreate: string,
-  createPost: Function,
+  postsError: ?AdaptedError,
+  stateOfCreate: RMLOperationState,
+  createPost: $PropertyType<RestClientInstance, "create">,
   history: Object
 };
 

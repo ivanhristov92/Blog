@@ -12,32 +12,26 @@ import DeletePromptDialog from "../components/delete-prompt-dialog";
 import PostPreviewGrid from "../components/post-preview-grid";
 
 import * as _ from "ramda";
-
 import type { Props as EntryListProps } from "../components/model-entries-list";
 
-type SlateContent = Object;
-
-export type AdaptedPostFromServer = {
-  title: string,
-  content: SlateContent,
-  excerpt: string,
-  featuredImage: string,
-  id: number
-};
+import type {
+  AdaptedPost,
+  RestClientInstance
+} from "../model-blog-post/rest-client-blog-post";
 
 type State = {
   selectedEntryIndexes: Array<number>,
-  selectedEntries: Array<AdaptedPostFromServer>,
+  selectedEntries: Array<AdaptedPost>,
   bulkEditSectionOpen: boolean,
   previewGridSectionOpen: boolean,
   bulkDeleteInitiated: boolean
 };
 
 type Props = {
-  allPosts: Array<AdaptedPostFromServer>,
-  readPosts: Function,
-  updatePosts: Function,
-  deletePosts: Function,
+  allPosts: Array<AdaptedPost>,
+  readPosts: $PropertyType<RestClientInstance, "read">,
+  updatePosts: $PropertyType<RestClientInstance, "update">,
+  deletePosts: $PropertyType<RestClientInstance, "delete">,
   history: Object
 };
 
@@ -228,9 +222,9 @@ class _PostListPage extends React.Component<Props, State> {
    * Helpers
    */
   adaptPostsForEntryList = (
-    allPosts: typeof Props.allPosts,
+    allPosts: $PropertyType<Props, "allPosts">,
     fields: Array<string>
-  ): typeof EntryListProps.entries => {
+  ): $PropertyType<EntryListProps, "entries"> => {
     let transform = _.map(
       _.compose(
         _.values,
