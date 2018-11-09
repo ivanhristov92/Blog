@@ -11,7 +11,6 @@ import { sampleValue } from "./rich-text/serializers";
 import { Prompt } from "react-router-dom";
 import * as _ from "ramda";
 import placeholder from "../images/placeholder.jpg";
-import type { AdaptedPostFromServer } from "../pages/page-post-list";
 import type { AdaptedPostWithoutId } from "../model-blog-post/rest-client-blog-post";
 
 type AdaptedError = {
@@ -259,7 +258,7 @@ export default class NewBlogPostForm extends React.Component<Props, State> {
       return !_.equals(valuesInState, valuesInDefaultState);
     }
 
-    return defaultEntry => {
+    return (defaultEntry: Object) => {
       if (!defaultEntry || !this.state) {
         return false;
       }
@@ -272,7 +271,7 @@ export default class NewBlogPostForm extends React.Component<Props, State> {
     };
   })();
 
-  isInErrors = input => {
+  isInErrors = (input: string) => {
     if (!this.props.error) return false;
     return (this.props.error.messages || {}).hasOwnProperty(input);
   };

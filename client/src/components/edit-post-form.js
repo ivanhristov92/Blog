@@ -1,5 +1,4 @@
 // @flow
-
 import React from "react";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
@@ -45,7 +44,7 @@ const getValuesOfEntry = (entry: AdaptedPost) =>
   _.evolve({ content: Value.fromJSON }, entry);
 
 export default class EditBlogPostForm extends React.Component<Props, State> {
-  featuredImageRef: ?Object;
+  featuredImageRef: Object;
 
   constructor(props: Props) {
     super(props);
@@ -275,7 +274,7 @@ export default class EditBlogPostForm extends React.Component<Props, State> {
 
   renderErrors = () => {
     if (!this.props.error) return null;
-    let messages = Object.entries(this.props.error.messages || {});
+    let messages: Array<any> = Object.entries(this.props.error.messages || {});
 
     return messages.map(([key, list]) => {
       return (
