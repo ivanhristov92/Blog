@@ -12,6 +12,28 @@ class CustomConfirmation extends React.Component {
     open: true
   };
 
+  refuse = () => {
+    this.setState(
+      {
+        open: false
+      },
+      () => {
+        this.props.callback(false);
+      }
+    );
+  };
+
+  confirm = () => {
+    this.setState(
+      {
+        open: false
+      },
+      () => {
+        this.props.callback(true);
+      }
+    );
+  };
+
   render() {
     return (
       <div>
@@ -28,34 +50,10 @@ class CustomConfirmation extends React.Component {
             </DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button
-              onClick={() => {
-                this.setState(
-                  {
-                    open: false
-                  },
-                  () => {
-                    this.props.callback(false);
-                  }
-                );
-              }}
-              color="primary"
-            >
+            <Button onClick={this.refuse} color="primary">
               Cancel
             </Button>
-            <Button
-              onClick={() => {
-                this.setState(
-                  {
-                    open: false
-                  },
-                  () => {
-                    this.props.callback(true);
-                  }
-                );
-              }}
-              color="secondary"
-            >
+            <Button onClick={this.confirm} color="secondary">
               Continue
             </Button>
           </DialogActions>
