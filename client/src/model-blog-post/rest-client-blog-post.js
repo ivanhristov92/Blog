@@ -1,9 +1,14 @@
 // @flow
 import superagent from "superagent";
 import * as _ from "ramda";
-import type { RMLRestClientInstance } from "redux-manager-lib/crud-rest-api.flow";
+import type {
+  RMLRestClient,
+  RMLCreate,
+  RMLRead,
+  RMLUpdate,
+  RMLDelete
+} from "redux-manager-lib/crud-rest-api.flow";
 import * as adapters from "./rest-client-adapters-blog-post";
-const ROOT = "http://localhost:3000";
 
 export type AdaptedPostWithoutId = {
   title: string,
@@ -18,22 +23,29 @@ export type AdaptedPost = {
 
 type AdaptedPostId = $PropertyType<AdaptedPost, "id">;
 type SlateContent = Object;
+
 /**
- * Outbound Types - What Is Expected Of React, through Redux (in action creators)
+ * Client Instance Type
+ * ====================
+ *
+ * RMLCreate<ExpectsPayload, EntryShape, ErrorShape>
+ * RMLRead<ExpectsPayload, EntryShape, ErrorShape>
+ * RMLUpdate<ExpectsPayload, EntryShape, ErrorShape>
+ * RMLDelete<ExpectsPayload, IdType, ErrorShape>
  */
-type ExpectedPayloads = {
-  create: AdaptedPostWithoutId,
-  read: ?AdaptedPostId,
-  update: AdaptedPost | Array<AdaptedPost>,
-  delete: AdaptedPostId | Array<AdaptedPostId>
+type RestClientInstance = {
+  create: RMLCreate<AdaptedPostWithoutId, AdaptedPost, Error>,
+  read: RMLRead<?AdaptedPostId, AdaptedPost, Error>,
+  update: RMLUpdate<AdaptedPost | Array<AdaptedPost>, AdaptedPost, Error>,
+  delete: RMLDelete<AdaptedPostId | Array<AdaptedPostId>, AdaptedPostId, Error>
 };
+
+const ROOT = "http://localhost:3000";
 
 /**
  * Creating
  */
-const create: $PropertyType<RMLRestClientInstance, "create"> = function create(
-  payload: $PropertyType<ExpectedPayloads, "create">
-) {
+const create = function create(payload) {
   return superagent
     .post(ROOT + "/posts")
     .send(payload)
@@ -60,9 +72,7 @@ const readAll = function readAll() {
   return superagent.get(`${ROOT}/posts`).then(adapters.normalizeAndWrapMany);
 };
 
-const read: $PropertyType<RMLRestClientInstance, "read"> = function read(
-  id: $PropertyType<ExpectedPayloads, "read">
-) {
+const read = function read(id) {
   return id ? readOne(id) : readAll();
 };
 
@@ -99,9 +109,7 @@ function updateOne(entry) {
     });
 }
 
-const update: $PropertyType<RMLRestClientInstance, "update"> = function update(
-  entry: $PropertyType<ExpectedPayloads, "update">
-) {
+const update = function update(entry) {
   let promise = Array.isArray(entry) ? updateSome(entry) : updateOne(entry);
   return promise.catch(error => {
     return Promise.reject(adapters.adaptErrorForReact(error));
@@ -130,10 +138,7 @@ function deleteOne(id) {
   });
 }
 
-const _delete: $PropertyType<
-  RMLRestClientInstance,
-  "delete"
-> = function _delete(ids: $PropertyType<ExpectedPayloads, "delete">) {
+const _delete = function _delete(ids) {
   return Array.isArray(ids) ? deleteSome(ids) : deleteOne(ids);
 };
 
@@ -141,7 +146,7 @@ const _delete: $PropertyType<
  * The Whole Client
  */
 
-const client: RMLRestClientInstance = {
+const client: RMLRestClient & RestClientInstance = {
   create,
   read,
   update,

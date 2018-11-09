@@ -12,6 +12,7 @@ import { Prompt } from "react-router-dom";
 import * as _ from "ramda";
 import placeholder from "../images/placeholder.jpg";
 import type { AdaptedPostFromServer } from "../pages/page-post-list";
+import type { AdaptedPostWithoutId } from "../model-blog-post/rest-client-blog-post";
 
 type AdaptedError = {
   error: Object,
@@ -113,7 +114,10 @@ export default class NewBlogPostForm extends React.Component<Props, State> {
    */
   createPost = () => {
     const formatContent = content => JSON.stringify(content.toJSON());
-    let payload = _.evolve({ content: formatContent }, this.state);
+    let payload: AdaptedPostWithoutId = _.evolve(
+      { content: formatContent },
+      this.state
+    );
     this.props.createPost(payload);
   };
 
