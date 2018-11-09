@@ -11,7 +11,7 @@ import placeholder from "../images/placeholder.jpg";
 import { Prompt } from "react-router-dom";
 
 import * as _ from "ramda";
-import type { AdaptedPostFromServer } from "../pages/page-post-list";
+import type { AdaptedPost } from "../model-blog-post/rest-client-blog-post";
 import { emptyValue } from "./rich-text/serializers";
 
 type AdaptedError = {
@@ -20,7 +20,7 @@ type AdaptedError = {
 };
 
 type Props = {
-  entries: Array<AdaptedPostFromServer>,
+  entries: Array<AdaptedPost>,
   updatePost: Function,
   cancelEditing: Function,
   deletePost?: Function,
@@ -41,7 +41,7 @@ const defaultState: State = Object.freeze({
   excerpt: ""
 });
 
-const getValuesOfEntry = (entry: AdaptedPostFromServer) =>
+const getValuesOfEntry = (entry: AdaptedPost) =>
   _.evolve({ content: Value.fromJSON }, entry);
 
 export default class EditBlogPostForm extends React.Component<Props, State> {

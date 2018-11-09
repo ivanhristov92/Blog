@@ -5,12 +5,34 @@ import type { RMLRestClientInstance } from "redux-manager-lib/crud-rest-api.flow
 import * as adapters from "./rest-client-adapters-blog-post";
 const ROOT = "http://localhost:3000";
 
+export type AdaptedPostWithoutId = {
+  title: string,
+  content: SlateContent,
+  excerpt: string,
+  featuredImage: string
+};
+
+export type AdaptedPost = {
+  id: number | string
+} & AdaptedPostWithoutId;
+
+type AdaptedPostId = $PropertyType<AdaptedPost, "id">;
+type SlateContent = Object;
+/**
+ * Outbound Types - What Is Expected Of React, through Redux (in action creators)
+ */
+type ExpectedPayloads = {
+  create: AdaptedPostWithoutId,
+  read: ?AdaptedPostId,
+  update: AdaptedPost | Array<AdaptedPost>,
+  delete: AdaptedPostId | Array<AdaptedPostId>
+};
+
 /**
  * Creating
  */
-
 const create: $PropertyType<RMLRestClientInstance, "create"> = function create(
-  payload
+  payload: $PropertyType<ExpectedPayloads, "create">
 ) {
   return superagent
     .post(ROOT + "/posts")
@@ -38,7 +60,9 @@ const readAll = function readAll() {
   return superagent.get(`${ROOT}/posts`).then(adapters.normalizeAndWrapMany);
 };
 
-const read: $PropertyType<RMLRestClientInstance, "read"> = function read(id) {
+const read: $PropertyType<RMLRestClientInstance, "read"> = function read(
+  id: $PropertyType<ExpectedPayloads, "read">
+) {
   return id ? readOne(id) : readAll();
 };
 
@@ -76,7 +100,7 @@ function updateOne(entry) {
 }
 
 const update: $PropertyType<RMLRestClientInstance, "update"> = function update(
-  entry
+  entry: $PropertyType<ExpectedPayloads, "update">
 ) {
   let promise = Array.isArray(entry) ? updateSome(entry) : updateOne(entry);
   return promise.catch(error => {
@@ -109,7 +133,7 @@ function deleteOne(id) {
 const _delete: $PropertyType<
   RMLRestClientInstance,
   "delete"
-> = function _delete(ids) {
+> = function _delete(ids: $PropertyType<ExpectedPayloads, "delete">) {
   return Array.isArray(ids) ? deleteSome(ids) : deleteOne(ids);
 };
 
