@@ -1,10 +1,10 @@
-# This is an experimental blog that uses ReduxManagerLb, Redux, React and Material UI.
+## This is an experimental blog that uses ReduxManagerLb, Redux, React and Material UI.
 
-## It is in active development right now.
+### It is in active development right now.
 
-## It provides a GUI for CRUD operations on posts.
+### It provides a GUI for CRUD operations on posts.
 
-## It look like this:
+### It look like this:
 
 ![alt text](https://github.com/ivanhristov92/Blog/blob/master/readme-images/home.png)
 
