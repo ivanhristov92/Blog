@@ -3,6 +3,7 @@ const convert = require("koa-connect");
 const history = require("connect-history-api-fallback");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const commonPaths = require("./paths");
+// require("@babel/plugin-proposal-object-rest-spread");
 
 module.exports = {
   entry: commonPaths.entryPath,
@@ -12,7 +13,8 @@ module.exports = {
         test: /\.(js|jsx|flow\.js)$/,
         loader: "babel-loader",
         options: {
-          presets: ["@babel/preset-flow"]
+          presets: ["@babel/preset-flow"],
+          plugins: ["@babel/plugin-proposal-object-rest-spread"]
         }
       },
       {

@@ -4,7 +4,7 @@ import {
   reducerFactory,
   selectorsFactory,
   bindSelectorsToState
-} from "redux-manager-lib";
+} from "redux-manager-lib/index";
 import moduleRestApi from "./rest-client-blog-post";
 
 const MODEL_NAME = "BlogPost";
@@ -27,6 +27,5 @@ const ModelBlogPost = {
   selectors,
   MODEL_NAME
 };
-console.log(ModelBlogPost);
 
 export default ModelBlogPost;

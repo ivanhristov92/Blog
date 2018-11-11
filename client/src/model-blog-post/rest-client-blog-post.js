@@ -50,7 +50,7 @@ export type RestClientInstance = RMLRestClient & {
   >
 };
 
-const ROOT = "http://localhost:3000";
+const ROOT = "http://localhost:3000/api";
 /**
  * Creating
  */

@@ -179,9 +179,6 @@ class RichTextExample extends React.Component {
             this.fileInput = el;
           }}
           onChange={e => {
-            console.log(this.editor);
-            console.log(e.target.files[0]);
-
             for (const file of e.target.files) {
               const reader = new FileReader();
               const [mime] = file.type.split("/");
@@ -333,7 +330,6 @@ class RichTextExample extends React.Component {
 
   renderNode = (props, editor, next) => {
     const { attributes, children, node } = props;
-    console.log(props);
     switch (node.type) {
       case "block-quote":
         return <blockquote {...attributes}>{children}</blockquote>;
@@ -377,7 +373,6 @@ class RichTextExample extends React.Component {
       case "underlined":
         return <u {...attributes}>{children}</u>;
       case "format-right":
-        debugger;
         return <span style={{ textAlign: "right" }}>{children}</span>;
       default:
         return next();

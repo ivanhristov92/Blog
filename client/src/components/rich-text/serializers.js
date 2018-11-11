@@ -98,7 +98,6 @@ const rules = [
             );
 
           case "image":
-            debugger;
           default:
             return <span>{children}</span>;
         }

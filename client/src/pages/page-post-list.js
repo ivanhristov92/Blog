@@ -9,6 +9,7 @@ import { bindActionCreators } from "redux";
 import Typography from "@material-ui/core/Typography";
 import DeletePromptDialog from "../components/delete-prompt-dialog";
 import PostPreviewGrid from "../components/post-preview-grid";
+import type { RMLOperationState } from "redux-manager-lib/crud-reducer.flow";
 import * as _ from "ramda";
 import type { Props as EntryListProps } from "../components/model-entries-list";
 
@@ -29,6 +30,8 @@ type Props = {
   allPosts: Array<AdaptedPost>,
   readPosts: $PropertyType<RestClientInstance, "read">,
   updatePosts: $PropertyType<RestClientInstance, "update">,
+  stateOfUpdate: RMLOperationState,
+
   deletePosts: $PropertyType<RestClientInstance, "delete">,
   history: Object
 };
@@ -70,8 +73,10 @@ class _PostListPage extends React.Component<Props, State> {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (prevState.selectedEntryIndexes !== this.state.selectedEntryIndexes) {
-      this.cancelBulkEdit();
+    if (prevProps.stateOfUpdate !== this.props.stateOfUpdate) {
+      if (this.props.stateOfUpdate === "SUCCESS") {
+        this.cancelBulkEdit();
+      }
     }
   }
 
@@ -244,8 +249,7 @@ const PostListPage = connect(
     return {
       allPosts: BlogPostModel.selectors.getAll(state),
       postsError: BlogPostModel.selectors.getError(state),
-      deleteState: BlogPostModel.selectors.getOperationStates(state).delete,
-      createState: BlogPostModel.selectors.getOperationStates(state).create
+      stateOfUpdate: BlogPostModel.selectors.getOperationStates(state).update
     };
   },
   function mapDispatchToProps(dispatch) {
