@@ -1,3 +1,4 @@
+// @flow
 import { pathOr } from "ramda";
 import { normalize, schema } from "normalizr";
 
@@ -14,8 +15,9 @@ export type AdaptedPost = {
 
 export type AdaptedError = {
   error: Object,
-  messages: { [fieldName: string]: Array<string> }
+  messages: { [fieldName: $Keys<AdaptedPost>]: Array<string> }
 };
+
 type SlateContent = Object;
 
 /**

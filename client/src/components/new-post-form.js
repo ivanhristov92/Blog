@@ -4,7 +4,6 @@ import React from "react";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import { Paper } from "@material-ui/core";
-import Chip from "@material-ui/core/Chip";
 import RichText from "./rich-text/rich-text";
 import { Value } from "slate";
 import { sampleValue } from "./rich-text/serializers";
@@ -139,6 +138,8 @@ export default class NewBlogPostForm extends React.Component<Props, State> {
             InputLabelProps={{
               shrink: true
             }}
+            error={this.isInErrors("title")}
+            helperText={this.getErrorMessageFor("title")}
           />
         </div>
         <Paper>
@@ -159,7 +160,6 @@ export default class NewBlogPostForm extends React.Component<Props, State> {
             Cancel
           </Button>
         </div>
-        {this.renderErrors()}
         <input
           type={"file"}
           hidden
@@ -214,34 +214,9 @@ export default class NewBlogPostForm extends React.Component<Props, State> {
           </div>
         </div>
         <hr />
-
-        <div />
-        {this.renderErrors()}
       </div>
     );
   }
-
-  renderErrors = () => {
-    debugger;
-    if (!this.props.error) return null;
-    let messages = Object.entries(this.props.error.messages || {});
-
-    return messages.map(([key, list]) => {
-      return (
-        <div>
-          {list.map(l => {
-            return (
-              <Chip
-                label={key + " " + l}
-                color="secondary"
-                variant="outlined"
-              />
-            );
-          })}
-        </div>
-      );
-    });
-  };
 
   /**
    * Helpers
@@ -274,5 +249,13 @@ export default class NewBlogPostForm extends React.Component<Props, State> {
   isInErrors = (input: string) => {
     if (!this.props.error) return false;
     return (this.props.error.messages || {}).hasOwnProperty(input);
+  };
+
+  getErrorMessageFor = (input: string) => {
+    try {
+      return this.props.error.messages[input].join("; ");
+    } catch {
+      return "";
+    }
   };
 }
