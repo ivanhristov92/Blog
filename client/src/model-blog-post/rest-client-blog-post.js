@@ -21,11 +21,19 @@ type AdaptedPostId = $PropertyType<AdaptedPost, "id">;
  * Client Instance Type
  * ====================
  *
- * RMLCreate<ExpectsPayload, EntryShape, ErrorShape>
- * RMLRead<ExpectsPayload, EntryShape, ErrorShape>
- * RMLUpdate<ExpectsPayload, EntryShape, ErrorShape>
- * RMLDelete<ExpectsPayload, IdType, ErrorShape>
+ * RMLCreate, RMLRead, RMLUpdate
+
+   type RMLCreate<ExpectsPayload, EntryShape, ErrorShape> = (
+    payload: ExpectsPayload
+   ) => Promise<RMLNormalizedDataInWrapper<EntryShape> | ErrorShape>
+
+ * RMLDelete
+
+   type RMLDelete<ExpectsPayload, IdType, ErrorShape> = (
+    payload: ExpectsPayload
+   ) => Promise<{ ids: Array<IdType> } | { id: IdType } | ErrorShape>
  */
+
 export type RestClientInstance = RMLRestClient & {
   create: RMLCreate<AdaptedPostWithoutId, AdaptedPost, AdaptedError>,
   read: RMLRead<?AdaptedPostId, AdaptedPost, AdaptedError>,
