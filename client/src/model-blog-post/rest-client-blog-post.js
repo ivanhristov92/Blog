@@ -13,6 +13,7 @@ import type {
   AdaptedError,
   AdaptedPost
 } from "./rest-client-adapters-blog-post";
+export type { AdaptedPost, AdaptedError };
 
 export type AdaptedPostWithoutId = $Diff<AdaptedPost, { id: any }>;
 type AdaptedPostId = $PropertyType<AdaptedPost, "id">;

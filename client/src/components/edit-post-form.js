@@ -10,13 +10,11 @@ import placeholder from "../images/placeholder.jpg";
 import { Prompt } from "react-router-dom";
 
 import * as _ from "ramda";
-import type { AdaptedPost } from "../model-blog-post/rest-client-blog-post";
+import type {
+  AdaptedPost,
+  AdaptedError
+} from "../model-blog-post/rest-client-blog-post";
 import { emptyValue } from "./rich-text/serializers";
-
-type AdaptedError = {
-  error: Object,
-  messages: { [fieldName: string]: Array<string> }
-};
 
 type Props = {
   entries: Array<AdaptedPost>,

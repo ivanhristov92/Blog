@@ -11,8 +11,10 @@ import { sampleValue } from "./rich-text/serializers";
 import { Prompt } from "react-router-dom";
 import * as _ from "ramda";
 import placeholder from "../images/placeholder.jpg";
-import type { AdaptedPostWithoutId } from "../model-blog-post/rest-client-blog-post";
-import type { AdaptedError } from "../model-blog-post/rest-client-adapters-blog-post";
+import type {
+  AdaptedPostWithoutId,
+  AdaptedError
+} from "../model-blog-post/rest-client-blog-post";
 
 type Props = {
   createPost: Function,
