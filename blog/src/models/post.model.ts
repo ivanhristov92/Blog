@@ -15,21 +15,21 @@ export class Post extends Entity {
   content?: string;
 
 
-    @property({
-        type: 'string',
-    })
-    featuredImage?: string;
+  @property({
+    type: 'string',
+  })
+  featuredImage?: string;
 
 
-    @property({
-        type: 'string',
-    })
-    excerpt?: string;
+  @property({
+    type: 'string',
+  })
+  excerpt?: string;
 
 
-    @property({
+  @property({
     type: 'number',
-    id: true,
+  id: true,
   })
   id?: number;
 

@@ -157,6 +157,8 @@ export default class EditBlogPostForm extends React.Component<Props, State> {
             InputLabelProps={{
               shrink: true
             }}
+            error={this.isInErrors("title")}
+            helperText={this.getErrorMessageFor("title")}
           />
         </div>
         <Paper>
@@ -270,30 +272,17 @@ export default class EditBlogPostForm extends React.Component<Props, State> {
     };
   })();
 
-  renderErrors = () => {
-    if (!this.props.error) return null;
-    let messages: Array<any> = Object.entries(this.props.error.messages || {});
-
-    return messages.map(([key, list]) => {
-      return (
-        <div>
-          {list.map(l => {
-            return (
-              <Chip
-                label={key + " " + l}
-                color="secondary"
-                variant="outlined"
-              />
-            );
-          })}
-        </div>
-      );
-    });
+  isInErrors = (input: string) => {
+    if (!this.props.error) return false;
+    return (this.props.error.messages || {}).hasOwnProperty(input);
   };
 
-  isInErrors = (inputName: string) => {
-    if (!this.props.error) return false;
-    return (this.props.error.messages || {}).hasOwnProperty(inputName);
+  getErrorMessageFor = (input: string) => {
+    try {
+      return this.props.error.messages[input].join("; ");
+    } catch {
+      return "";
+    }
   };
 
   /**

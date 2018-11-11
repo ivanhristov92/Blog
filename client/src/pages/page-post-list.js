@@ -6,11 +6,9 @@ import BlogPostModel from "../model-blog-post/model-blog-post";
 import EditBlogPostForm from "../components/edit-post-form";
 import connect from "react-redux/es/connect/connect";
 import { bindActionCreators } from "redux";
-import { fromJSONToPlain } from "../components/rich-text/serializers";
 import Typography from "@material-ui/core/Typography";
 import DeletePromptDialog from "../components/delete-prompt-dialog";
 import PostPreviewGrid from "../components/post-preview-grid";
-
 import * as _ from "ramda";
 import type { Props as EntryListProps } from "../components/model-entries-list";
 
