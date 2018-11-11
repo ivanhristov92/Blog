@@ -7,6 +7,7 @@ export class Category extends Entity {
     type: 'string',
       id: true,
       required: true,
+
   })
   title: string;
 

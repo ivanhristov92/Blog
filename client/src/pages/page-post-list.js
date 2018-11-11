@@ -149,12 +149,13 @@ class _PostListPage extends React.Component<Props, State> {
   };
 
   closeDialogAndDoDelete = () => {
+    let idsOfPostsToDelete = _.map(_.prop("id"), this.state.selectedEntries);
     this.setState(
       {
-        bulkDeleteInitiated: false
+        bulkDeleteInitiated: false,
+        selectedEntryIndexes: []
       },
-      () =>
-        this.props.deletePosts(_.map(_.prop("id"), this.state.selectedEntries))
+      () => this.props.deletePosts(idsOfPostsToDelete)
     );
   };
 
