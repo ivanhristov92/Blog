@@ -216,11 +216,13 @@ export default class NewBlogPostForm extends React.Component<Props, State> {
         <hr />
 
         <div />
+        {this.renderErrors()}
       </div>
     );
   }
 
   renderErrors = () => {
+    debugger;
     if (!this.props.error) return null;
     let messages = Object.entries(this.props.error.messages || {});
 

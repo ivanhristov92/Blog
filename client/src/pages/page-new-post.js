@@ -37,6 +37,7 @@ class _NewPostPage extends React.Component<Props> {
           this.props.history.push("/");
         }}
         stateOfCreate={this.props.stateOfCreate}
+        error={this.props.postsError}
       />
     );
   }

@@ -51,7 +51,6 @@ export type RestClientInstance = RMLRestClient & {
 };
 
 const ROOT = "http://localhost:3000";
-
 /**
  * Creating
  */
@@ -63,7 +62,7 @@ const create = function create(payload) {
     .catch(
       _.pipe(
         adapters.adaptErrorForReact,
-        Promise.reject
+        Promise.reject.bind(Promise)
       )
     );
 };
@@ -121,9 +120,12 @@ function updateOne(entry) {
 
 const update = function update(entry) {
   let promise = Array.isArray(entry) ? updateSome(entry) : updateOne(entry);
-  return promise.catch(error => {
-    return Promise.reject(adapters.adaptErrorForReact(error));
-  });
+  return promise.catch(
+    _.pipe(
+      adapters.adaptErrorForReact,
+      Promise.reject.bind(Promise)
+    )
+  );
 };
 
 /**
