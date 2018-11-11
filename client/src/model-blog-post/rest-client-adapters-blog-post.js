@@ -42,12 +42,12 @@ const post = new schema.Entity(
 );
 const arrayOfPosts = [post];
 
-export function normalizeAndWrapOne(response) {
+export function normalizeAndWrapOne(response: { body: Array<any> }) {
   const normalizedData = normalize(response.body, post);
   return { byId: normalizedData.entities.post };
 }
 
-export function normalizeAndWrapMany(response) {
+export function normalizeAndWrapMany(response: { body: any }) {
   const normalizedData = normalize(response.body, arrayOfPosts);
   return { byId: normalizedData.entities.post };
 }
@@ -56,19 +56,13 @@ export function normalizeAndWrapMany(response) {
  * Error Adapter
  */
 export function adaptErrorForReact(error: Error): AdaptedError {
-  if (
-    pathOr("", ["response", "body", "error", "name"], error) ===
-    "ValidationError"
-  ) {
-    let messages = pathOr(
-      "",
-      ["response", "body", "error", "details", "messages"],
-      error
-    );
-    return {
-      error: error,
-      messages
-    };
-  }
-  return error;
+  let messages = pathOr(
+    "",
+    ["response", "body", "error", "details", "messages"],
+    error
+  );
+  return {
+    error: error,
+    messages
+  };
 }
