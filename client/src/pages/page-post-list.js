@@ -15,7 +15,8 @@ import type { Props as EntryListProps } from "../components/model-entries-list";
 
 import type {
   AdaptedPost,
-  RestClientInstance
+  RestClientInstance,
+  AdaptedError
 } from "../model-blog-post/rest-client-blog-post";
 
 type State = {
@@ -29,6 +30,7 @@ type State = {
 type Props = {
   allPosts: Array<AdaptedPost>,
   readPosts: $PropertyType<RestClientInstance, "read">,
+  postsError: ?AdaptedError,
   updatePosts: $PropertyType<RestClientInstance, "update">,
   stateOfUpdate: RMLOperationState,
 
@@ -188,18 +190,21 @@ class _PostListPage extends React.Component<Props, State> {
           onDeleteClicked={this.initiateBulkDelete}
           onPreviewClicked={this.togglePreviewSection}
         />
-        {this.state.bulkEditSectionOpen && (
-          <>
-            <Typography variant="h4" color="inherit">
-              <h4 className={"bulk-edit-title"}>Bulk Editing</h4>
-            </Typography>
-            <EditBlogPostForm
-              entries={this.state.selectedEntries}
-              cancelEditing={this.cancelBulkEdit}
-              updatePost={this.doBulkEdit}
-            />
-          </>
-        )}
+        {this.state.bulkEditSectionOpen &&
+          this.state.selectedEntryIndexes.length && (
+            <>
+              <Typography variant="h4" color="inherit">
+                <h4 className={"bulk-edit-title"}>Bulk Editing</h4>
+              </Typography>
+              <EditBlogPostForm
+                key={1}
+                entries={this.state.selectedEntries}
+                error={this.props.postsError}
+                cancelEditing={this.cancelBulkEdit}
+                updatePost={this.doBulkEdit}
+              />
+            </>
+          )}
 
         {!this.state.bulkEditSectionOpen &&
           this.state.previewGridSectionOpen &&

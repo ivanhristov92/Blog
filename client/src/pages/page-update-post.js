@@ -43,6 +43,7 @@ class _PostDetailsPage extends React.Component<Props> {
   render() {
     return (
       <EditBlogPostForm
+        key={2}
         entries={this.props.post ? [this.props.post] : []}
         cancelEditing={() => {
           this.props.history.push("/");

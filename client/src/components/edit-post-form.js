@@ -3,7 +3,6 @@ import React from "react";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import { Paper } from "@material-ui/core";
-import Chip from "@material-ui/core/Chip";
 import RichText from "./rich-text/rich-text";
 import { Value } from "slate";
 import placeholder from "../images/placeholder.jpg";
