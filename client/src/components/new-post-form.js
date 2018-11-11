@@ -12,11 +12,7 @@ import { Prompt } from "react-router-dom";
 import * as _ from "ramda";
 import placeholder from "../images/placeholder.jpg";
 import type { AdaptedPostWithoutId } from "../model-blog-post/rest-client-blog-post";
-
-type AdaptedError = {
-  error: Object,
-  messages: { [fieldName: string]: Array<string> }
-};
+import type { AdaptedError } from "../model-blog-post/rest-client-adapters-blog-post";
 
 type Props = {
   createPost: Function,

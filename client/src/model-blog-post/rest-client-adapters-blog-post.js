@@ -8,10 +8,11 @@ export type AdaptedPost = {
   featuredImage: string,
   id: number | string
 };
-
+export type AdaptedError = {
+  error: Object,
+  messages: { [fieldName: string]: Array<string> }
+};
 type SlateContent = Object;
-
-export type AdaptedError = { error: Error, message: any };
 
 /**
  * Normalization & Entry Adapter
