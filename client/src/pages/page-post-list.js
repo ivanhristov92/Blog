@@ -35,7 +35,7 @@ type Props = {
   history: Object
 };
 
-const ENTRY_LIST_COLUMNS = ["id", "title", "content"];
+const ENTRY_LIST_COLUMNS = ["id", "title", "excerpt"];
 
 class _PostListPage extends React.Component<Props, State> {
   state = {
@@ -228,7 +228,6 @@ class _PostListPage extends React.Component<Props, State> {
     let transform = _.map(
       _.compose(
         _.values,
-        _.evolve({ content: fromJSONToPlain }),
         _.pick(fields)
       )
     );
