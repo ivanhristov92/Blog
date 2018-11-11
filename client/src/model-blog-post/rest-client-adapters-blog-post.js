@@ -1,6 +1,9 @@
 import { pathOr } from "ramda";
 import { normalize, schema } from "normalizr";
 
+/**
+ * Adapted Types - what the app expects
+ */
 export type AdaptedPost = {
   title: string,
   content: SlateContent,
@@ -8,6 +11,7 @@ export type AdaptedPost = {
   featuredImage: string,
   id: number | string
 };
+
 export type AdaptedError = {
   error: Object,
   messages: { [fieldName: string]: Array<string> }
