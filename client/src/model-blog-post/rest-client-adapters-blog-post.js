@@ -1,6 +1,18 @@
 import { pathOr } from "ramda";
 import { normalize, schema } from "normalizr";
-import type { AdaptedError } from "./rest-client-blog-post";
+
+export type AdaptedPost = {
+  title: string,
+  content: SlateContent,
+  excerpt: string,
+  featuredImage: string,
+  id: number | string
+};
+
+type SlateContent = Object;
+
+export type AdaptedError = { error: Error, message: any };
+
 /**
  * Normalization & Entry Adapter
  */

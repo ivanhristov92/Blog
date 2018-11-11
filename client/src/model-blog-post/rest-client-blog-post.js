@@ -9,22 +9,13 @@ import type {
   RMLDelete
 } from "redux-manager-lib/crud-rest-api.flow";
 import * as adapters from "./rest-client-adapters-blog-post";
+import type {
+  AdaptedError,
+  AdaptedPost
+} from "./rest-client-adapters-blog-post";
 
-export type AdaptedPostWithoutId = {
-  title: string,
-  content: SlateContent,
-  excerpt: string,
-  featuredImage: string
-};
-
-export type AdaptedPost = {
-  id: number | string
-} & AdaptedPostWithoutId;
-
-export type AdaptedError = { error: Error, message: any };
-
+export type AdaptedPostWithoutId = $Diff<AdaptedPost, { id: any }>;
 type AdaptedPostId = $PropertyType<AdaptedPost, "id">;
-type SlateContent = Object;
 
 /**
  * Client Instance Type
@@ -35,7 +26,7 @@ type SlateContent = Object;
  * RMLUpdate<ExpectsPayload, EntryShape, ErrorShape>
  * RMLDelete<ExpectsPayload, IdType, ErrorShape>
  */
-export type RestClientInstance = {
+export type RestClientInstance = RMLRestClient & {
   create: RMLCreate<AdaptedPostWithoutId, AdaptedPost, AdaptedError>,
   read: RMLRead<?AdaptedPostId, AdaptedPost, AdaptedError>,
   update: RMLUpdate<
@@ -96,7 +87,7 @@ function updateSome(entries) {
       return superagent.patch(`${ROOT}/posts/${ent.id}`).send(ent);
     })
   ).then(() => {
-    let byId = entries.reduce((acc, ent) => {
+    let byId: Object = entries.reduce((acc, ent) => {
       return _.assoc(ent.id, ent, acc);
     }, {});
 
@@ -135,11 +126,13 @@ function deleteSome(ids) {
     ids.map(id => {
       return superagent.del(`${ROOT}/posts/${id}`);
     })
-  ).then(() => {
-    return {
-      ids
-    };
-  });
+  ).then(
+    (): Object => {
+      return {
+        ids
+      };
+    }
+  );
 }
 
 function deleteOne(id) {
@@ -156,7 +149,7 @@ const _delete = function _delete(ids) {
  * The Whole Client
  */
 
-const client: RMLRestClient & RestClientInstance = {
+const client: RestClientInstance = {
   create,
   read,
   update,
