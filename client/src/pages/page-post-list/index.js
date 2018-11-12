@@ -18,7 +18,6 @@ import type {
   RestClientInstance,
   AdaptedError
 } from "../../model-blog-post/rest-client-blog-post";
-import { Prompt } from "react-router-dom";
 
 type State = {
   selectedEntryIndexes: Array<number>,

@@ -1,6 +1,6 @@
 import React from "react";
 import AppBar from "./components/app-bar";
-import { Router, Route, Switch } from "react-router-dom";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import createBrowserHistory from "history/createBrowserHistory";
 import PostListPage from "./pages/page-post-list";
 import NewPostPage from "./pages/page-new-post";
@@ -9,14 +9,10 @@ import getUserConfirmation from "./components/user-confirmation";
 import Breadcrumbs from "./components/breadcrumbs";
 import "./styles/general.css";
 
-let history = createBrowserHistory({
-  getUserConfirmation: getUserConfirmation
-});
-
 export default class App extends React.Component {
   render() {
     return (
-      <Router history={history}>
+      <Router getUserConfirmation={getUserConfirmation}>
         <>
           <AppBar />
           <Breadcrumbs />

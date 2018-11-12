@@ -38,32 +38,17 @@ class _PostDetailsPage extends React.Component<Props, State> {
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.stateOfDelete !== this.props.stateOfDelete) {
-      if (this.props.stateOfDelete === "SUCCESS") {
-        this.setState(
-          {
-            entryContentHasChanged: false
-          },
-          () => this.props.history.push("/")
-        );
-      }
-    } else if (prevProps.stateOfUpdate !== this.props.stateOfUpdate) {
-      if (this.props.stateOfUpdate === "SUCCESS") {
-        this.setState(
-          {
-            entryContentHasChanged: false
-          },
-          () => this.props.history.push("/")
-        );
-      }
+    if (this.operationIsSuccessful("stateOfDelete", prevProps)) {
+      this.setEntryContentHasChanged(false, () => this.props.history.push("/"));
+    } else if (this.operationIsSuccessful("stateOfUpdate", prevProps)) {
+      this.setEntryContentHasChanged(false, () => this.props.history.push("/"));
     }
   }
 
   render() {
-    //asd
     return (
       <>
-        <Prompt when={this.state.entryContentHasChanged} message={"eeeeee"} />
+        <Prompt when={this.state.entryContentHasChanged} message={"update"} />
 
         <EditBlogPostForm
           key={2}
@@ -87,6 +72,22 @@ class _PostDetailsPage extends React.Component<Props, State> {
       </>
     );
   }
+
+  operationIsSuccessful = (operation, prevProps) => {
+    if (prevProps[operation] === this.props[operation]) {
+      return false;
+    }
+    return this.props[operation] === "SUCCESS";
+  };
+
+  setEntryContentHasChanged = (value: boolean, cb = () => {}) => {
+    this.setState(
+      {
+        entryContentHasChanged: value
+      },
+      cb
+    );
+  };
 }
 const PostDetailsPage = connect(
   function mapStateToProps(state, props) {
