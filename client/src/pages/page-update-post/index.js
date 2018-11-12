@@ -1,14 +1,14 @@
 // @flow
 
 import React from "react";
-import EditBlogPostForm from "../components/edit-post-form";
+import EditBlogPostForm from "../../components/update-post-form";
 import connect from "react-redux/es/connect/connect";
-import BlogPostModel from "../model-blog-post/model-blog-post";
+import BlogPostModel from "../../model-blog-post/model-blog-post";
 import { bindActionCreators } from "redux";
 import type {
   RestClientInstance,
   AdaptedPost
-} from "../model-blog-post/rest-client-blog-post";
+} from "../../model-blog-post/rest-client-blog-post";
 import type { RMLOperationState } from "redux-manager-lib/crud-reducer.flow";
 
 type Props = {

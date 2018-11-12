@@ -1,23 +1,23 @@
 // @flow
 
 import React from "react";
-import ModelEntriesList from "../components/model-entries-list";
-import BlogPostModel from "../model-blog-post/model-blog-post";
-import EditBlogPostForm from "../components/edit-post-form";
+import PostEntriesList from "./post-entries-list";
+import BlogPostModel from "../../model-blog-post/model-blog-post";
+import EditBlogPostForm from "../../components/update-post-form";
 import connect from "react-redux/es/connect/connect";
 import { bindActionCreators } from "redux";
 import Typography from "@material-ui/core/Typography";
-import DeletePromptDialog from "../components/delete-prompt-dialog";
-import PostPreviewGrid from "../components/post-preview-grid";
+import DeletePromptDialog from "../../components/delete-prompt-dialog";
+import PostPreviewGrid from "./post-preview-grid";
 import type { RMLOperationState } from "redux-manager-lib/crud-reducer.flow";
 import * as _ from "ramda";
-import type { Props as EntryListProps } from "../components/model-entries-list";
+import type { Props as EntryListProps } from "./post-entries-list";
 
 import type {
   AdaptedPost,
   RestClientInstance,
   AdaptedError
-} from "../model-blog-post/rest-client-blog-post";
+} from "../../model-blog-post/rest-client-blog-post";
 
 type State = {
   selectedEntryIndexes: Array<number>,
@@ -162,7 +162,7 @@ class _PostListPage extends React.Component<Props, State> {
     return (
       <div className={"page-container post-list-page-wrapper"}>
         <div />
-        <ModelEntriesList
+        <PostEntriesList
           title={BlogPostModel.MODEL_NAME}
           entries={entriesForList}
           columns={ENTRY_LIST_COLUMNS}

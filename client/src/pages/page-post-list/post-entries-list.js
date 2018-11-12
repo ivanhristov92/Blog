@@ -37,7 +37,7 @@ export type Props = {
 } & DataAndSelectionRelatedProps &
   CustomToolbarRelatedProps;
 
-export default class ModelEntriesList extends React.Component<Props> {
+export default class PostEntriesList extends React.Component<Props> {
   render() {
     /**
      * Custom options for MUIDataTable

@@ -4,16 +4,16 @@ import React from "react";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import { Paper } from "@material-ui/core";
-import RichText from "./rich-text/rich-text";
+import RichText from "../../components/rich-text/rich-text";
 import { Value } from "slate";
-import { sampleValue } from "./rich-text/serializers";
+import { sampleValue } from "../../components/rich-text/serializers";
 import { Prompt } from "react-router-dom";
 import * as _ from "ramda";
-import placeholder from "../images/placeholder.jpg";
+import placeholder from "../../images/placeholder.jpg";
 import type {
   AdaptedPostWithoutId,
   AdaptedError
-} from "../model-blog-post/rest-client-blog-post";
+} from "../../model-blog-post/rest-client-blog-post";
 
 type Props = {
   createPost: Function,

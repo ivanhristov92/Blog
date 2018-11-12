@@ -7,7 +7,7 @@ import CardMedia from "@material-ui/core/CardMedia";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 
-import placeholder from "../images/placeholder.jpg";
+import placeholder from "../../images/placeholder.jpg";
 
 function ImgMediaCard(props) {
   return (

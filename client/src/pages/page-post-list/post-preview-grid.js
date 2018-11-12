@@ -1,7 +1,7 @@
 import React from "react";
 import GridList from "@material-ui/core/GridList/GridList";
 import GridListTile from "@material-ui/core/GridListTile/GridListTile";
-import Card from "./card";
+import Card from "./single-post-preview-card";
 
 export default class PostPreviewGrid extends React.Component {
   render() {
