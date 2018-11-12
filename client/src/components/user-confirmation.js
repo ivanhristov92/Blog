@@ -8,7 +8,7 @@ import Button from "@material-ui/core/Button/Button";
 import ReactDOM from "react-dom";
 import PromptDialog from "./delete-prompt-dialog";
 
-class CustomConfirmation extends React.Component {
+export class CustomConfirmation extends React.Component {
   state = {
     open: true
   };
