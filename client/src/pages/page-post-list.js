@@ -22,7 +22,7 @@ import type {
 type State = {
   selectedEntryIndexes: Array<number>,
   selectedEntries: Array<AdaptedPost>,
-  bulkEditSectionOpen: boolean,
+  bulkUpdateSectionOpen: boolean,
   previewGridSectionOpen: boolean,
   bulkDeleteInitiated: boolean
 };
@@ -33,12 +33,25 @@ type Props = {
   postsError: ?AdaptedError,
   updatePosts: $PropertyType<RestClientInstance, "update">,
   stateOfUpdate: RMLOperationState,
-
   deletePosts: $PropertyType<RestClientInstance, "delete">,
   history: Object
 };
 
 const ENTRY_LIST_COLUMNS = ["id", "title", "excerpt"];
+
+const changes = {
+  cancelBulkUpdate: { bulkUpdateSectionOpen: false },
+  toggleBulkUpdate: state => ({
+    bulkUpdateSectionOpen: !state.bulkUpdateSectionOpen
+  }),
+  cancelBulkDelete: { bulkDeleteInitiated: false },
+
+  initiateBulkDelete: { bulkDeleteInitiated: true },
+  deselectEntries: { selectedEntryIndexes: [] },
+  togglePreviewGrid: state => ({
+    previewGridSectionOpen: !state.previewGridSectionOpen
+  })
+};
 
 class _PostListPage extends React.Component<Props, State> {
   state = {
@@ -50,7 +63,7 @@ class _PostListPage extends React.Component<Props, State> {
     selectedEntries: [],
 
     /** Flag for bulk editing */
-    bulkEditSectionOpen: false,
+    bulkUpdateSectionOpen: false,
 
     /** Flag for showing a list of the selected
      * table rows bellow the table
@@ -64,9 +77,10 @@ class _PostListPage extends React.Component<Props, State> {
   static getDerivedStateFromProps(props, state) {
     return {
       ...state,
-      selectedEntries: state.selectedEntryIndexes.map(tableRowIndex => {
-        return props.allPosts[tableRowIndex];
-      })
+      selectedEntries: _.map(
+        tableRowIndex => props.allPosts[tableRowIndex],
+        state.selectedEntryIndexes
+      )
     };
   }
 
@@ -77,7 +91,7 @@ class _PostListPage extends React.Component<Props, State> {
   componentDidUpdate(prevProps, prevState) {
     if (prevProps.stateOfUpdate !== this.props.stateOfUpdate) {
       if (this.props.stateOfUpdate === "SUCCESS") {
-        this.cancelBulkEdit();
+        this.applyChanges([changes.cancelBulkUpdate]);
       }
     }
   }
@@ -109,32 +123,17 @@ class _PostListPage extends React.Component<Props, State> {
   };
 
   /**
-   * PREVIEW GRID - grid view of selected posts
-   */
-  togglePreviewSection = () => {
-    this.setState({
-      previewGridSectionOpen: !this.state.previewGridSectionOpen
-    });
-  };
-
-  /**
    * EDITING
    */
-  navigateToPostOrToggleBulkEditSection = () => {
+  navigateToPostOrToggleBulkUpdateSection = () => {
     if (this.state.selectedEntryIndexes.length === 1) {
       this.navigateToSelectedPost();
     } else {
-      this.toggleBulkEdit();
+      this.applyChanges([changes.toggleBulkUpdate]);
     }
   };
-  toggleBulkEdit = () => {
-    this.setState({ bulkEditSectionOpen: !this.state.bulkEditSectionOpen });
-  };
-  cancelBulkEdit = () => {
-    this.setState({ bulkEditSectionOpen: false });
-  };
 
-  doBulkEdit = data => {
+  doBulkUpdate = data => {
     const addNewData = _.merge(_.__, data);
     let payload = _.map(addNewData, this.state.selectedEntries);
     this.props.updatePosts(payload);
@@ -143,26 +142,11 @@ class _PostListPage extends React.Component<Props, State> {
   /**
    * DELETING
    */
-  initiateBulkDelete = () => {
-    this.setState({
-      bulkDeleteInitiated: true
-    });
-  };
 
-  cancelDelete = () => {
-    this.setState({
-      bulkDeleteInitiated: false
-    });
-  };
-
-  closeDialogAndDoDelete = () => {
+  confirmDelete = () => {
     let idsOfPostsToDelete = _.map(_.prop("id"), this.state.selectedEntries);
-    this.setState(
-      {
-        bulkDeleteInitiated: false,
-        selectedEntryIndexes: []
-      },
-      () => this.props.deletePosts(idsOfPostsToDelete)
+    this.applyChanges([changes.cancelBulkDelete, changes.deselectEntries], () =>
+      this.props.deletePosts(idsOfPostsToDelete)
     );
   };
 
@@ -177,20 +161,21 @@ class _PostListPage extends React.Component<Props, State> {
 
     return (
       <div className={"page-container post-list-page-wrapper"}>
+        <div />
         <ModelEntriesList
           title={BlogPostModel.MODEL_NAME}
           entries={entriesForList}
           columns={ENTRY_LIST_COLUMNS}
           rowsSelected={this.state.selectedEntryIndexes}
-          isEditingActive={this.state.bulkEditSectionOpen}
+          isEditingActive={this.state.bulkUpdateSectionOpen}
           isPreviewingActive={this.state.previewGridSectionOpen}
           onCreateClicked={this.navigateToNewPost}
           onRowsSelected={this.handleRowSelectionChange}
-          onEditClicked={this.navigateToPostOrToggleBulkEditSection}
-          onDeleteClicked={this.initiateBulkDelete}
-          onPreviewClicked={this.togglePreviewSection}
+          onEditClicked={this.navigateToPostOrToggleBulkUpdateSection}
+          onDeleteClicked={this.applyChangesF([changes.cancelBulkDelete])}
+          onPreviewClicked={this.applyChangesF([changes.togglePreviewGrid])}
         />
-        {this.state.bulkEditSectionOpen &&
+        {this.state.bulkUpdateSectionOpen &&
           this.state.selectedEntryIndexes.length && (
             <>
               <Typography variant="h4" color="inherit">
@@ -200,13 +185,13 @@ class _PostListPage extends React.Component<Props, State> {
                 key={1}
                 entries={this.state.selectedEntries}
                 error={this.props.postsError}
-                cancelEditing={this.cancelBulkEdit}
-                updatePost={this.doBulkEdit}
+                cancelEditing={this.applyChangesF([changes.cancelBulkUpdate])}
+                updatePost={this.doBulkUpdate}
               />
             </>
           )}
 
-        {!this.state.bulkEditSectionOpen &&
+        {!this.state.bulkUpdateSectionOpen &&
           this.state.previewGridSectionOpen &&
           this.state.selectedEntryIndexes.length && (
             <PostPreviewGrid
@@ -220,8 +205,8 @@ class _PostListPage extends React.Component<Props, State> {
           message={`${this.state.selectedEntries.length} / ${
             this.props.allPosts.length
           } entries selected. Are you sure you want to delete them?`}
-          onCancel={this.cancelDelete}
-          onContinue={this.closeDialogAndDoDelete}
+          onCancel={this.applyChangesF([changes.cancelBulkDelete])}
+          onContinue={this.confirmDelete}
         />
       </div>
     );
@@ -243,12 +228,41 @@ class _PostListPage extends React.Component<Props, State> {
 
     return transform(allPosts);
   };
+
+  applyChanges = (changes, cb = () => {}) => {
+    let chs = _.reduce(
+      (acc, curr) => {
+        if (typeof curr === "function") {
+          return _.merge(acc, curr(this.state));
+        }
+        return _.merge(acc, curr);
+      },
+      {},
+      changes
+    );
+    this.setState(chs, cb);
+  };
+
+  applyChangesF = (changes, cb = () => {}) => {
+    return () => {
+      let chs = _.reduce(
+        (acc, curr) => {
+          if (typeof curr === "function") {
+            return _.merge(acc, curr(this.state));
+          }
+          return _.merge(acc, curr);
+        },
+        {},
+        changes
+      );
+      this.setState(chs, cb);
+    };
+  };
 }
 
 /**
  * Connect With Redux
  */
-
 const PostListPage = connect(
   function mapStateToProps(state) {
     return {
