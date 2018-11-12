@@ -21,7 +21,8 @@ type Props = {
   updatePost: Function,
   cancelEditing: Function,
   deletePost?: Function,
-  error?: ?AdaptedError
+  error?: ?AdaptedError,
+  onEntryContentChange?: Function
 };
 
 type State = {
@@ -65,11 +66,17 @@ export default class EditBlogPostForm extends React.Component<Props, State> {
     }
   }
 
-  componentDidUpdate(prevProps: Props) {
+  componentDidUpdate(prevProps: Props, prevState: State) {
     if (this.goingToOneEntry(prevProps)) {
       this.setStateToFirstEntry();
     } else if (this.movingAwayFromOneEntry(prevProps)) {
       this.setStateDefaults();
+    }
+
+    if (prevState !== this.state) {
+      if (this.props.onEntryContentChange) {
+        this.props.onEntryContentChange(this.entryContentHasChanged());
+      }
     }
   }
 
@@ -159,8 +166,6 @@ export default class EditBlogPostForm extends React.Component<Props, State> {
   render() {
     return (
       <div className="edit-post-form-wrapper">
-        <Prompt when={this.entryContentHasChanged()} message={location => {}} />
-
         <DeletePromptDialog
           open={this.state.deleteModalOpen}
           message={`Are you sure you want to delete this post?`}
@@ -292,6 +297,7 @@ export default class EditBlogPostForm extends React.Component<Props, State> {
         this.state,
         firstEntry
       );
+
       return richTextHasChanges || somePropertiesHaveChanges;
     };
   })();

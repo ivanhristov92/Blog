@@ -6,7 +6,7 @@ import DialogContentText from "@material-ui/core/DialogContentText/DialogContent
 import DialogActions from "@material-ui/core/DialogActions/DialogActions";
 import Button from "@material-ui/core/Button/Button";
 
-export default class DeletePromptDialog extends React.Component {
+export default class PromptDialog extends React.Component {
   render() {
     let { open, message, onCancel, onContinue } = this.props;
     return (

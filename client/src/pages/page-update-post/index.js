@@ -10,11 +10,12 @@ import type {
   AdaptedPost
 } from "../../model-blog-post/rest-client-blog-post";
 import type { RMLOperationState } from "redux-manager-lib/crud-reducer.flow";
+import { Prompt } from "react-router-dom";
 
 type Props = {
   post: AdaptedPost,
-  deleteState: RMLOperationState,
-  updateState: RMLOperationState,
+  stateOfUpdate: RMLOperationState,
+  stateOfDelete: RMLOperationState,
   match: Object,
   history: Object,
 
@@ -23,39 +24,67 @@ type Props = {
   deletePost: $PropertyType<RestClientInstance, "delete">
 };
 
-class _PostDetailsPage extends React.Component<Props> {
+type State = {
+  entryContentHasChanged: boolean
+};
+
+class _PostDetailsPage extends React.Component<Props, State> {
+  state = {
+    entryContentHasChanged: false
+  };
+
   componentWillMount() {
     this.props.readPost(this.props.match.params.id);
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.deleteState !== this.props.deleteState) {
-      if (this.props.deleteState === "SUCCESS") {
-        this.props.history.push("/");
+    if (prevProps.stateOfDelete !== this.props.stateOfDelete) {
+      if (this.props.stateOfDelete === "SUCCESS") {
+        this.setState(
+          {
+            entryContentHasChanged: false
+          },
+          () => this.props.history.push("/")
+        );
       }
-    } else if (prevProps.updateState !== this.props.updateState) {
-      if (this.props.updateState === "SUCCESS") {
-        this.props.history.push("/");
+    } else if (prevProps.stateOfUpdate !== this.props.stateOfUpdate) {
+      if (this.props.stateOfUpdate === "SUCCESS") {
+        this.setState(
+          {
+            entryContentHasChanged: false
+          },
+          () => this.props.history.push("/")
+        );
       }
     }
   }
 
   render() {
+    //asd
     return (
-      <EditBlogPostForm
-        key={2}
-        entries={this.props.post ? [this.props.post] : []}
-        cancelEditing={() => {
-          this.props.history.push("/");
-        }}
-        updatePost={payload => {
-          this.props.updatePost({
-            ...payload,
-            id: Number(this.props.match.params.id)
-          });
-        }}
-        deletePost={() => this.props.deletePost(this.props.match.params.id)}
-      />
+      <>
+        <Prompt when={this.state.entryContentHasChanged} message={"eeeeee"} />
+
+        <EditBlogPostForm
+          key={2}
+          entries={this.props.post ? [this.props.post] : []}
+          cancelEditing={() => {
+            this.props.history.push("/");
+          }}
+          updatePost={payload => {
+            this.props.updatePost({
+              ...payload,
+              id: Number(this.props.match.params.id)
+            });
+          }}
+          deletePost={() => this.props.deletePost(this.props.match.params.id)}
+          onEntryContentChange={changed =>
+            this.setState({
+              entryContentHasChanged: changed
+            })
+          }
+        />
+      </>
     );
   }
 }
@@ -63,8 +92,8 @@ const PostDetailsPage = connect(
   function mapStateToProps(state, props) {
     return {
       post: BlogPostModel.selectors.getOne(state, props.match.params.id),
-      deleteState: BlogPostModel.selectors.getOperationStates(state).delete,
-      updateState: BlogPostModel.selectors.getOperationStates(state).update
+      stateOfDelete: BlogPostModel.selectors.getOperationStates(state).delete,
+      stateOfUpdate: BlogPostModel.selectors.getOperationStates(state).update
     };
   },
   function mapDispatchToProps(dispatch) {

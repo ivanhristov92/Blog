@@ -9,6 +9,7 @@ import type {
   RestClientInstance,
   AdaptedError
 } from "../../model-blog-post/rest-client-blog-post";
+import { Prompt } from "react-router-dom";
 
 type Props = {
   postsError: ?AdaptedError,
@@ -17,28 +18,48 @@ type Props = {
   history: Object
 };
 
-class _NewPostPage extends React.Component<Props> {
+type State = {
+  entryContentHasChanged: boolean
+};
+
+class _NewPostPage extends React.Component<Props, State> {
+  state = {
+    entryContentHasChanged: false
+  };
+
   /**
    * On successful create, navigate to 'home'
    */
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps, prevState) {
     if (this.props.stateOfCreate !== prevProps.stateOfCreate) {
       if (this.props.stateOfCreate === "SUCCESS") {
-        this.props.history.push("/");
+        this.setState(
+          {
+            entryContentHasChanged: false
+          },
+          () => this.props.history.push("/")
+        );
       }
     }
   }
 
   render() {
     return (
-      <NewBlogPostForm
-        createPost={this.props.createPost}
-        cancelCreating={() => {
-          this.props.history.push("/");
-        }}
-        stateOfCreate={this.props.stateOfCreate}
-        error={this.props.postsError}
-      />
+      <>
+        <Prompt when={this.state.entryContentHasChanged} message={"ddd"} />
+
+        <NewBlogPostForm
+          createPost={this.props.createPost}
+          cancelCreating={() => {
+            this.props.history.push("/");
+          }}
+          stateOfCreate={this.props.stateOfCreate}
+          error={this.props.postsError}
+          onEntryContentChange={changed =>
+            this.setState({ entryContentHasChanged: changed })
+          }
+        />
+      </>
     );
   }
 }

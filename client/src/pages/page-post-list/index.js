@@ -18,6 +18,7 @@ import type {
   RestClientInstance,
   AdaptedError
 } from "../../model-blog-post/rest-client-blog-post";
+import { Prompt } from "react-router-dom";
 
 type State = {
   selectedEntryIndexes: Array<number>,
@@ -162,6 +163,7 @@ class _PostListPage extends React.Component<Props, State> {
     return (
       <div className={"page-container post-list-page-wrapper"}>
         <div />
+
         <PostEntriesList
           title={BlogPostModel.MODEL_NAME}
           entries={entriesForList}

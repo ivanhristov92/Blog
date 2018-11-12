@@ -19,7 +19,8 @@ type Props = {
   createPost: Function,
   cancelCreating: Function,
   error?: ?AdaptedError,
-  stateOfCreate: string
+  stateOfCreate: string,
+  onEntryContentChange: Function
 };
 
 type State = {
@@ -41,10 +42,15 @@ export default class NewBlogPostForm extends React.Component<Props, State> {
 
   state = defaultState;
 
-  componentDidUpdate(prevProps: Props) {
+  componentDidUpdate(prevProps: Props, prevState: State) {
     if (prevProps.stateOfCreate !== this.props.stateOfCreate) {
       if (this.props.stateOfCreate === "SUCCESS") {
         this.setStateDefaults();
+      }
+    }
+    if (prevState !== this.state) {
+      if (this.props.onEntryContentChange) {
+        this.props.onEntryContentChange(this.entryContentHasChanged());
       }
     }
   }
@@ -120,11 +126,6 @@ export default class NewBlogPostForm extends React.Component<Props, State> {
   render() {
     return (
       <div className="new-post-form-wrapper">
-        <Prompt
-          when={this.entryContentHasChanged(defaultState)}
-          message={location => {}}
-        />
-
         <div className={"post-title-wrapper"}>
           <TextField
             id="outlined-full-width"
@@ -233,14 +234,11 @@ export default class NewBlogPostForm extends React.Component<Props, State> {
       return !_.equals(valuesInState, valuesInDefaultState);
     }
 
-    return (defaultEntry: Object) => {
-      if (!defaultEntry || !this.state) {
-        return false;
-      }
-      let richTextHasChanges = compareRichTextStates(this.state, defaultEntry);
+    return () => {
+      let richTextHasChanges = compareRichTextStates(this.state, defaultState);
       let somePropertiesHaveChanges = compareAllButRichTextStates(
         this.state,
-        defaultEntry
+        defaultState
       );
       return richTextHasChanges || somePropertiesHaveChanges;
     };
