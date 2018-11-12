@@ -14,6 +14,7 @@ import type {
   AdaptedError
 } from "../model-blog-post/rest-client-blog-post";
 import { emptyValue } from "./rich-text/serializers";
+import DeletePromptDialog from "./delete-prompt-dialog";
 
 type Props = {
   entries: Array<AdaptedPost>,
@@ -27,15 +28,22 @@ type State = {
   title: string,
   content: Object,
   featuredImage: string,
-  excerpt: string
+  excerpt: string,
+  deleteModalOpen: boolean
 };
 
 const defaultState: State = Object.freeze({
   title: "",
   content: Value.fromJS(emptyValue),
   featuredImage: "",
-  excerpt: ""
+  excerpt: "",
+  deleteModalOpen: false
 });
+
+const changes = {
+  closeDeleteModal: { deleteModalOpen: false },
+  openDeleteModal: { deleteModalOpen: true }
+};
 
 const getValuesOfEntry = (entry: AdaptedPost) =>
   _.evolve({ content: Value.fromJSON }, entry);
@@ -48,7 +56,10 @@ export default class EditBlogPostForm extends React.Component<Props, State> {
 
     if (props.entries.length === 1) {
       let entry = props.entries[0];
-      this.state = getValuesOfEntry(entry);
+      this.state = {
+        ...getValuesOfEntry(entry),
+        deleteModalOpen: false
+      };
     } else {
       this.state = defaultState;
     }
@@ -138,10 +149,24 @@ export default class EditBlogPostForm extends React.Component<Props, State> {
     this.props.updatePost(payload);
   };
 
+  /**
+   * Deleting
+   */
+  confirmDelete = () => {
+    this.applyChanges([changes.closeDeleteModal], this.props.deletePost);
+  };
+
   render() {
     return (
       <div className="edit-post-form-wrapper">
         <Prompt when={this.entryContentHasChanged()} message={location => {}} />
+
+        <DeletePromptDialog
+          open={this.state.deleteModalOpen}
+          message={`Are you sure you want to delete this post?`}
+          onCancel={this.applyChangesF([changes.closeDeleteModal])}
+          onContinue={this.confirmDelete}
+        />
 
         <div className={"post-title-wrapper"}>
           <TextField
@@ -182,7 +207,7 @@ export default class EditBlogPostForm extends React.Component<Props, State> {
             <Button
               variant="contained"
               color="secondary"
-              onClick={this.props.deletePost}
+              onClick={this.applyChangesF([changes.openDeleteModal])}
             >
               Delete
             </Button>
@@ -293,5 +318,23 @@ export default class EditBlogPostForm extends React.Component<Props, State> {
 
   goingToOneEntry = (prevProps: Props) => {
     return this.props.entries.length === 1 && prevProps.entries.length !== 1;
+  };
+
+  applyChanges = (changes, cb = () => {}) => {
+    let chs = _.reduce(
+      (acc, curr) => {
+        if (typeof curr === "function") {
+          return _.merge(acc, curr(this.state));
+        }
+        return _.merge(acc, curr);
+      },
+      {},
+      changes
+    );
+    this.setState(chs, cb);
+  };
+
+  applyChangesF = (changes, cb = () => {}) => {
+    return () => this.applyChanges(changes, cb);
   };
 }

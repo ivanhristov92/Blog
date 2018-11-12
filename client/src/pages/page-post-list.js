@@ -172,7 +172,7 @@ class _PostListPage extends React.Component<Props, State> {
           onCreateClicked={this.navigateToNewPost}
           onRowsSelected={this.handleRowSelectionChange}
           onEditClicked={this.navigateToPostOrToggleBulkUpdateSection}
-          onDeleteClicked={this.applyChangesF([changes.cancelBulkDelete])}
+          onDeleteClicked={this.applyChangesF([changes.initiateBulkDelete])}
           onPreviewClicked={this.applyChangesF([changes.togglePreviewGrid])}
         />
         {this.state.bulkUpdateSectionOpen &&
@@ -244,19 +244,7 @@ class _PostListPage extends React.Component<Props, State> {
   };
 
   applyChangesF = (changes, cb = () => {}) => {
-    return () => {
-      let chs = _.reduce(
-        (acc, curr) => {
-          if (typeof curr === "function") {
-            return _.merge(acc, curr(this.state));
-          }
-          return _.merge(acc, curr);
-        },
-        {},
-        changes
-      );
-      this.setState(chs, cb);
-    };
+    return () => this.applyChanges(changes, cb);
   };
 }
 

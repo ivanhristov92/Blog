@@ -73,7 +73,7 @@ const create = function create(payload) {
 
 const readOne = function(id) {
   return superagent
-    .get(`$PROOT}/posts/${id}`)
+    .get(`${ROOT}/posts/${id}`)
     .then(adapters.normalizeAndWrapOne);
 };
 
