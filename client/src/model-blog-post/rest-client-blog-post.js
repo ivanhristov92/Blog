@@ -8,7 +8,9 @@ import type {
   RMLUpdate,
   RMLDelete
 } from "redux-manager-lib/crud-rest-api.flow";
+import { dispatchAnUnexpectedErrorEvent } from "redux-manager-lib";
 import * as adapters from "./rest-client-adapters-blog-post";
+import { postAdapters } from "./rest-client-adapters-blog-post";
 import type {
   AdaptedError,
   AdaptedPost
@@ -57,8 +59,21 @@ const ROOT = "http://localhost:3000/api";
 const create = function create(payload) {
   return superagent
     .post(ROOT + "/posts")
-    .send(payload)
-    .then(adapters.normalizeAndWrapOne)
+    .send(postAdapters.stringifyContentOnly(payload))
+    .then(response => {
+      try {
+        return {
+          byId: postAdapters.normalizeOne(response.body)
+        };
+      } catch (err) {
+        dispatchAnUnexpectedErrorEvent(err, {
+          method: "create",
+          response,
+          payload
+        });
+        throw err;
+      }
+    })
     .catch(
       _.pipe(
         adapters.adaptErrorForReact,
@@ -72,13 +87,33 @@ const create = function create(payload) {
  */
 
 const readOne = function(id) {
-  return superagent
-    .get(`${ROOT}/posts/${id}`)
-    .then(adapters.normalizeAndWrapOne);
+  return superagent.get(`${ROOT}/posts/${id}`).then(response => {
+    try {
+      return {
+        byId: postAdapters.normalizeOne(response.body)
+      };
+    } catch (err) {
+      dispatchAnUnexpectedErrorEvent(err, {
+        method: "readOne",
+        response,
+        arguments: { id }
+      });
+      throw err;
+    }
+  });
 };
 
 const readAll = function readAll() {
-  return superagent.get(`${ROOT}/posts`).then(adapters.normalizeAndWrapMany);
+  return superagent.get(`${ROOT}/posts`).then(response => {
+    try {
+      return {
+        byId: postAdapters.normalizeMany(response.body)
+      };
+    } catch (err) {
+      dispatchAnUnexpectedErrorEvent(err, { method: "readAll", response });
+      throw err;
+    }
+  });
 };
 
 const read = function read(id) {
@@ -92,29 +127,46 @@ const read = function read(id) {
 function updateSome(entries) {
   return Promise.all(
     entries.map(ent => {
-      return superagent.patch(`${ROOT}/posts/${ent.id}`).send(ent);
+      let adaptedEntry = postAdapters.stringifyContentOnly(ent);
+      return superagent.patch(`${ROOT}/posts/${ent.id}`).send(adaptedEntry);
     })
   ).then(() => {
-    let byId: Object = entries.reduce((acc, ent) => {
-      return _.assoc(ent.id, ent, acc);
-    }, {});
+    try {
+      let byId: Object = entries.reduce((acc, ent) => {
+        return _.assoc(ent.id, ent, acc);
+      }, {});
 
-    return {
-      byId
-    };
+      return {
+        byId
+      };
+    } catch (err) {
+      dispatchAnUnexpectedErrorEvent(err, {
+        method: "updateSome",
+        arguments: { entries }
+      });
+      throw err;
+    }
   });
 }
 
 function updateOne(entry) {
   return superagent
     .patch(`${ROOT}/posts/${entry.id}`)
-    .send(entry)
+    .send(postAdapters.stringifyContentOnly(entry))
     .then(() => {
-      return {
-        byId: {
-          [entry.id]: entry
-        }
-      };
+      try {
+        return {
+          byId: {
+            [entry.id]: entry
+          }
+        };
+      } catch (err) {
+        dispatchAnUnexpectedErrorEvent(err, {
+          method: "updateOne",
+          arguments: { entry }
+        });
+        throw err;
+      }
     });
 }
 
@@ -139,16 +191,32 @@ function deleteSome(ids) {
     })
   ).then(
     (): Object => {
-      return {
-        ids
-      };
+      try {
+        return {
+          ids
+        };
+      } catch (err) {
+        dispatchAnUnexpectedErrorEvent(err, {
+          method: "deleteSome",
+          arguments: { ids }
+        });
+        throw err;
+      }
     }
   );
 }
 
 function deleteOne(id) {
   return superagent.del(`${ROOT}/posts/${id}`).then(() => {
-    return { id };
+    try {
+      return { id };
+    } catch (err) {
+      dispatchAnUnexpectedErrorEvent(err, {
+        method: "deleteOne",
+        arguments: { id }
+      });
+      throw err;
+    }
   });
 }
 

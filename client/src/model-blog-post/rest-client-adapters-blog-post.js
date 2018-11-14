@@ -1,6 +1,18 @@
 // @flow
-import { pathOr } from "ramda";
+import { pathOr, evolve } from "ramda";
 import { normalize, schema } from "normalizr";
+import type { NormalizedData } from "redux-manager-lib/crud-rest-api.flow";
+
+/**
+ * Raw Types - what the server provides
+ */
+type RawPost = {
+  title: string,
+  content: string,
+  id: number,
+  featuredImage: string,
+  excerpt: string
+};
 
 /**
  * Adapted Types - what the app expects
@@ -12,24 +24,21 @@ export type AdaptedPost = {
   featuredImage: string,
   id: number | string
 };
+type SlateContent = Object;
 
 export type AdaptedError = {
   error: Object,
   messages: { [fieldName: $Keys<AdaptedPost>]: Array<string> }
 };
 
-type SlateContent = Object;
-
 /**
- * Normalization & Entry Adapter
+ * Normalization Schemas
  */
-const post = new schema.Entity(
+const postSchema = new schema.Entity(
   "post",
   {},
   {
-    // Optional. Just to show where data transformation
-    // can be done
-    processStrategy: (entity, parent, key) => {
+    processStrategy: (entity: RawPost, parent, key): AdaptedPost => {
       return {
         title: entity.title,
         content: JSON.parse(entity.content),
@@ -40,20 +49,26 @@ const post = new schema.Entity(
     }
   }
 );
-const arrayOfPosts = [post];
-
-export function normalizeAndWrapOne(response: { body: Array<any> }) {
-  const normalizedData = normalize(response.body, post);
-  return { byId: normalizedData.entities.post };
-}
-
-export function normalizeAndWrapMany(response: { body: any }) {
-  const normalizedData = normalize(response.body, arrayOfPosts);
-  return { byId: normalizedData.entities.post };
-}
+const arrayOfPosts = [postSchema];
 
 /**
- * Error Adapter
+ * Post Adapters
+ */
+const postAdapters = {
+  stringifyContentOnly: evolve({ content: c => JSON.stringify(c) }),
+  normalizeOne: (post: RawPost): NormalizedData<AdaptedPost> => {
+    const normalizedData = normalize(post, postSchema);
+    return normalizedData.entities.post;
+  },
+  normalizeMany: (posts: Array<RawPost>): NormalizedData<AdaptedPost> => {
+    const normalizedData = normalize(posts, arrayOfPosts);
+    return normalizedData.entities.post;
+  }
+};
+export { postAdapters };
+
+/**
+ * Error Adapters
  */
 export function adaptErrorForReact(error: Error): AdaptedError {
   let messages = pathOr(

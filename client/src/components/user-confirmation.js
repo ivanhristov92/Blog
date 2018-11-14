@@ -42,7 +42,7 @@ class CustomConfirmation extends React.Component {
           onClose={() => {}}
           aria-labelledby="form-dialog-title"
         >
-          <DialogTitle id="form-dialog-title">Delete</DialogTitle>
+          <DialogTitle id="form-dialog-title">Changes</DialogTitle>
           <DialogContent>
             <DialogContentText>
               You've made some changes. They will be lost if not saved. Do you

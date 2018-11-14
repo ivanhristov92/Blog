@@ -151,8 +151,10 @@ export default class EditBlogPostForm extends React.Component<Props, State> {
    * Editing
    */
   updatePost = () => {
-    const formatContent = content => JSON.stringify(content.toJSON());
-    let payload = _.evolve({ content: formatContent }, this.state);
+    let payload = _.evolve(
+      { content: content => content.toJSON() },
+      this.state
+    );
     this.props.updatePost(payload);
   };
 

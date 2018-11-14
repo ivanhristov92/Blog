@@ -115,9 +115,8 @@ export default class NewBlogPostForm extends React.Component<Props, State> {
    * Creating
    */
   createPost = () => {
-    const formatContent = content => JSON.stringify(content.toJSON());
     let payload: AdaptedPostWithoutId = _.evolve(
-      { content: formatContent },
+      { content: content => content.toJSON() },
       this.state
     );
     this.props.createPost(payload);
