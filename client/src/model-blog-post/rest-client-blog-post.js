@@ -68,7 +68,7 @@ export type ExpectedPayloads = {
 };
 
 const ROOT = "http://localhost:3000/api";
-let errorHandlerFunction: Function = dispatchAnUnexpectedErrorEvent;
+let errorHandlerFunction: Function = () => {}; //dispatchAnUnexpectedErrorEvent;
 export function setCustomErrorHandler(customErrorHandler: Function) {
   errorHandlerFunction = customErrorHandler;
 }
