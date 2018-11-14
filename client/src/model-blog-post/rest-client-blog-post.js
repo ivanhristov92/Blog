@@ -38,21 +38,40 @@ type AdaptedPostId = $PropertyType<AdaptedPost, "id">;
  */
 
 export type RestClientInstance = RMLRestClient & {
-  create: RMLCreate<AdaptedPostWithoutId, AdaptedPost, AdaptedError>,
-  read: RMLRead<?AdaptedPostId, AdaptedPost, AdaptedError>,
+  create: RMLCreate<
+    $PropertyType<ExpectedPayloads, "create">,
+    AdaptedPost,
+    AdaptedError
+  >,
+  read: RMLRead<
+    ?$PropertyType<ExpectedPayloads, "read">,
+    AdaptedPost,
+    AdaptedError
+  >,
   update: RMLUpdate<
-    AdaptedPost | Array<AdaptedPost>,
+    $PropertyType<ExpectedPayloads, "update">,
     AdaptedPost,
     AdaptedError
   >,
   delete: RMLDelete<
-    AdaptedPostId | Array<AdaptedPostId>,
+    $PropertyType<ExpectedPayloads, "delete">,
     AdaptedPostId,
     AdaptedError
   >
 };
 
+export type ExpectedPayloads = {
+  create: AdaptedPostWithoutId,
+  read: AdaptedPostId,
+  update: AdaptedPost | Array<AdaptedPost>,
+  delete: AdaptedPostId | Array<AdaptedPostId>
+};
+
 const ROOT = "http://localhost:3000/api";
+let errorHandlerFunction: Function = dispatchAnUnexpectedErrorEvent;
+export function setCustomErrorHandler(customErrorHandler: Function) {
+  errorHandlerFunction = customErrorHandler;
+}
 /**
  * Creating
  */
@@ -66,7 +85,7 @@ const create = function create(payload) {
           byId: postAdapters.normalizeOne(response.body)
         };
       } catch (err) {
-        dispatchAnUnexpectedErrorEvent(err, {
+        errorHandlerFunction(err, {
           method: "create",
           response,
           payload
@@ -93,7 +112,7 @@ const readOne = function(id) {
         byId: postAdapters.normalizeOne(response.body)
       };
     } catch (err) {
-      dispatchAnUnexpectedErrorEvent(err, {
+      errorHandlerFunction(err, {
         method: "readOne",
         response,
         arguments: { id }
@@ -110,7 +129,7 @@ const readAll = function readAll() {
         byId: postAdapters.normalizeMany(response.body)
       };
     } catch (err) {
-      dispatchAnUnexpectedErrorEvent(err, { method: "readAll", response });
+      errorHandlerFunction(err, { method: "readAll", response });
       throw err;
     }
   });
@@ -140,7 +159,7 @@ function updateSome(entries) {
         byId
       };
     } catch (err) {
-      dispatchAnUnexpectedErrorEvent(err, {
+      errorHandlerFunction(err, {
         method: "updateSome",
         arguments: { entries }
       });
@@ -161,7 +180,7 @@ function updateOne(entry) {
           }
         };
       } catch (err) {
-        dispatchAnUnexpectedErrorEvent(err, {
+        errorHandlerFunction(err, {
           method: "updateOne",
           arguments: { entry }
         });
@@ -196,7 +215,7 @@ function deleteSome(ids) {
           ids
         };
       } catch (err) {
-        dispatchAnUnexpectedErrorEvent(err, {
+        errorHandlerFunction(err, {
           method: "deleteSome",
           arguments: { ids }
         });
@@ -211,7 +230,7 @@ function deleteOne(id) {
     try {
       return { id };
     } catch (err) {
-      dispatchAnUnexpectedErrorEvent(err, {
+      errorHandlerFunction(err, {
         method: "deleteOne",
         arguments: { id }
       });

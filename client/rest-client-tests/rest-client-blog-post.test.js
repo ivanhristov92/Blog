@@ -1,10 +1,7 @@
 // @flow
 
 import client from "../src/model-blog-post/rest-client-blog-post";
-import type {
-  AdaptedPost,
-  AdaptedPostWithoutId
-} from "../src/model-blog-post/rest-client-blog-post";
+import type { ExpectedPayloads } from "../src/model-blog-post/rest-client-blog-post";
 import { describe, beforeEach, it } from "mocha";
 import * as _ from "ramda";
 var assert = require("assert");
@@ -20,7 +17,7 @@ describe("[RUNTIME SIGNATURE]", () => {
       beforeEach(wipeOutEntries);
 
       it("[ACCEPTS]", done => {
-        let mock: AdaptedPostWithoutId = {
+        let mock: $PropertyType<ExpectedPayloads, "create"> = {
           title: "test",
           excerpt: "some excerpt",
           content: {},
