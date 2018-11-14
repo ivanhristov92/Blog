@@ -6,9 +6,8 @@ import DialogContentText from "@material-ui/core/DialogContentText/DialogContent
 import DialogActions from "@material-ui/core/DialogActions/DialogActions";
 import Button from "@material-ui/core/Button/Button";
 import ReactDOM from "react-dom";
-import PromptDialog from "./delete-prompt-dialog";
 
-export class CustomConfirmation extends React.Component {
+class CustomConfirmation extends React.Component {
   state = {
     open: true
   };
@@ -36,17 +35,6 @@ export class CustomConfirmation extends React.Component {
   };
 
   render() {
-    // return (
-    //   <PromptDialog
-    //     open={this.state.open}
-    //     message={
-    //       "You've made some changes. They will be lost if not saved. Do you still want to continue?"
-    //     }
-    //     onCancel={this.refuse}
-    //     onContinue={this.confirm}
-    //   />
-    // );
-
     return (
       <div>
         <Dialog
