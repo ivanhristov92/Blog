@@ -84,21 +84,6 @@ describe("[RUNTIME SIGNATURE]", () => {
           });
         });
       });
-
-      describe("[OPERATION]", () => {
-        it("[CALLS] the error handler function", done => {
-          let errHandler = {
-            errHandler() {}
-          };
-          sinon.spy(errHandler, "errHandler");
-          let client = clientFactory(errHandler.errHandler);
-          let invalidPayload = {};
-          client.create(invalidPayload).catch(err => {
-            assert.notEqual(errHandler.errHandler.getCall(0), null);
-            done();
-          });
-        });
-      });
     });
   });
 
@@ -212,6 +197,206 @@ describe("[RUNTIME SIGNATURE]", () => {
                 ...mock,
                 id: idTwo
               });
+              done();
+            });
+        });
+      });
+    });
+  });
+
+  describe("update", () => {
+    let client = clientFactory();
+
+    describe("single update", () => {
+      describe("[EXPECTS]", () => {
+        it("[ACCEPTS] an object", done => {
+          client
+            .create(mock)
+            .then(({ byId }) => {
+              let entry = Object.values(byId)[0];
+              return client.update({ ...entry, title: "edited" });
+            })
+            .then(() => {
+              done();
+            });
+        });
+      });
+      describe("[RETURNS]", () => {
+        it("[CORRECT TYPE]", done => {
+          client
+            .create(mock)
+            .then(({ byId }) => {
+              let entry = Object.values(byId)[0];
+              return client.update({ ...entry, title: "edited" });
+            })
+            .then(response => {
+              assert.equal(typeof response.byId, "object");
+              assert.equal(Object.values(response.byId).length, 1);
+              done();
+            });
+        });
+        it("[CORRECT VALUE]", done => {
+          client
+            .create(mock)
+            .then(({ byId }) => {
+              let entry = Object.values(byId)[0];
+              return client.update({ ...entry, title: "edited" });
+            })
+            .then(response => {
+              let entry = Object.values(response.byId)[0];
+              assert.equal(entry.title, "edited");
+              done();
+            });
+        });
+      });
+    });
+
+    describe("multiple update", () => {
+      describe("[EXPECTS]", () => {
+        it("[ACCEPTS] an array of objects", done => {
+          Promise.all([mock, mock].map(client.create))
+            .then(([respOne, respTwo]) => {
+              let entryOne = Object.values(respOne.byId)[0];
+              let entryTwo = Object.values(respTwo.byId)[0];
+              return client.update([
+                { ...entryOne, title: "edit1" },
+                { ...entryTwo, title: "edit2" }
+              ]);
+            })
+            .then(() => {
+              done();
+            });
+        });
+      });
+      describe("[RETURNS]", () => {
+        it("[CORRECT TYPE]", done => {
+          Promise.all([mock, mock].map(client.create))
+            .then(([respOne, respTwo]) => {
+              let entryOne = Object.values(respOne.byId)[0];
+              let entryTwo = Object.values(respTwo.byId)[0];
+              return client.update([
+                { ...entryOne, title: "edit1" },
+                { ...entryTwo, title: "edit2" }
+              ]);
+            })
+
+            .then(response => {
+              assert.equal(typeof response.byId, "object");
+              assert.equal(Object.values(response.byId).length, 2);
+              done();
+            });
+        });
+        it("[CORRECT VALUE]", done => {
+          Promise.all([mock, mock].map(client.create))
+            .then(([respOne, respTwo]) => {
+              let entryOne = Object.values(respOne.byId)[0];
+              let entryTwo = Object.values(respTwo.byId)[0];
+              return client.update([
+                { ...entryOne, title: "edit1" },
+                { ...entryTwo, title: "edit2" }
+              ]);
+            })
+
+            .then(response => {
+              let entry1 = Object.values(response.byId)[0];
+              let entry2 = Object.values(response.byId)[1];
+              assert.equal(entry1.title, "edit1");
+              assert.equal(entry2.title, "edit2");
+              done();
+            });
+        });
+      });
+    });
+  });
+
+  describe("delete", () => {
+    let client = clientFactory();
+
+    describe("single delete", () => {
+      describe("[EXPECTS]", () => {
+        it("[ACCEPTS] an id", done => {
+          Promise.all([mock, mock].map(client.create))
+            .then(([respOne, respTwo]) => {
+              let idOne = Object.keys(respOne.byId)[0];
+              return client.delete(idOne);
+            })
+
+            .then(response => {
+              done();
+            });
+        });
+      });
+      describe("[RETURNS]", () => {
+        it("[CORRECT TYPE]", done => {
+          Promise.all([mock, mock].map(client.create))
+            .then(([respOne, respTwo]) => {
+              let idOne = Object.keys(respOne.byId)[0];
+              return client.delete(idOne);
+            })
+
+            .then(response => {
+              assert.notEqual(typeof response.id, "undefined");
+              done();
+            });
+        });
+        it("[CORRECT VALUE]", done => {
+          let id;
+          Promise.all([mock, mock].map(client.create))
+            .then(([respOne, respTwo]) => {
+              id = Object.keys(respOne.byId)[0];
+              return client.delete(id);
+            })
+
+            .then(response => {
+              assert.equal(response.id, id);
+              done();
+            });
+        });
+      });
+    });
+
+    describe("multiple delete", () => {
+      describe("[EXPECTS]", () => {
+        it("[ACCEPTS] an array of ids", done => {
+          Promise.all([mock, mock].map(client.create))
+            .then(([respOne, respTwo]) => {
+              let idOne = Object.keys(respOne.byId)[0];
+              let idTwo = Object.keys(respOne.byId)[1];
+              return client.delete([idOne, idTwo]);
+            })
+
+            .then(response => {
+              done();
+            });
+        });
+      });
+      describe("[RETURNS]", () => {
+        it("[CORRECT TYPE]", done => {
+          Promise.all([mock, mock].map(client.create))
+            .then(([respOne, respTwo]) => {
+              let idOne = Object.keys(respOne.byId)[0];
+              let idTwo = Object.keys(respOne.byId)[1];
+              return client.delete([idOne, idTwo]);
+            })
+
+            .then(response => {
+              assert.notEqual(typeof response.ids, "undefined");
+              done();
+            });
+        });
+        it("[CORRECT VALUE]", done => {
+          let ids;
+          Promise.all([mock, mock].map(client.create))
+            .then(([respOne, respTwo]) => {
+              ids = [
+                Object.keys(respOne.byId)[0],
+                Object.keys(respOne.byId)[1]
+              ];
+              return client.delete(ids);
+            })
+
+            .then(response => {
+              assert.deepEqual(response.ids, ids);
               done();
             });
         });

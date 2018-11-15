@@ -1,4 +1,4 @@
 require("@babel/register")({
   presets: ["@babel/preset-env", "@babel/preset-flow"],
-  ignore: []
+  ignore: [/node_modules\/(?!redux-manager-lib)/]
 });
