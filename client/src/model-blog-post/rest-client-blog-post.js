@@ -8,7 +8,7 @@ import type {
   RMLUpdate,
   RMLDelete
 } from "redux-manager-lib/crud-rest-api.flow";
-import { dispatchAnUnexpectedErrorEvent } from "redux-manager-lib";
+import { dispatchAnUnexpectedErrorEvent } from "redux-manager-lib/index";
 import * as adapters from "./rest-client-adapters-blog-post";
 import { postAdapters } from "./rest-client-adapters-blog-post";
 import type {
@@ -68,190 +68,190 @@ export type ExpectedPayloads = {
 };
 
 const ROOT = "http://localhost:3000/api";
-let errorHandlerFunction: Function = () => {}; //dispatchAnUnexpectedErrorEvent;
-export function setCustomErrorHandler(customErrorHandler: Function) {
-  errorHandlerFunction = customErrorHandler;
-}
+
 /**
  * Creating
  */
-const create = function create(payload) {
-  return superagent
-    .post(ROOT + "/posts")
-    .send(postAdapters.stringifyContentOnly(payload))
-    .then(response => {
-      try {
-        return {
-          byId: postAdapters.normalizeOne(response.body)
-        };
-      } catch (err) {
-        errorHandlerFunction(err, {
-          method: "create",
-          response,
-          payload
-        });
-        throw err;
+
+export default function clientFactory(customErrorHandler) {
+  let errorHandler = customErrorHandler || dispatchAnUnexpectedErrorEvent;
+
+  function create(payload) {
+    return ifErrorEmitGlobally(
+      () => {
+        const execute = () => _createOne(payload);
+        const executeAndAdaptError = addErrorAdapter(execute);
+        return executeAndAdaptError();
+      },
+      {
+        method: isArray(payload) ? "createMany" : "createOne",
+        payload
       }
-    })
-    .catch(
-      _.pipe(
-        adapters.adaptErrorForReact,
-        Promise.reject.bind(Promise)
-      )
     );
-};
+  }
 
-/**
- * Reading
- */
+  function _createOne(payload) {
+    return superagent
+      .post(ROOT + "/posts")
+      .send(postAdapters.stringifyContentOnly(payload))
+      .then(response => ({
+        byId: postAdapters.normalizeOne(response.body)
+      }));
+  }
 
-const readOne = function(id) {
-  return superagent.get(`${ROOT}/posts/${id}`).then(response => {
-    try {
+  /**
+   * Reading
+   */
+
+  function read(id) {
+    return ifErrorEmitGlobally(
+      () => {
+        let execute = id ? () => _readOne(id) : _readAll;
+        const executeAndAdaptError = addErrorAdapter(execute);
+        return executeAndAdaptError();
+      },
+      {
+        method: id ? "readOne" : "readAll",
+        id
+      }
+    );
+  }
+  function _readOne(id) {
+    return superagent.get(`${ROOT}/posts/${id}`).then(response => {
       return {
         byId: postAdapters.normalizeOne(response.body)
       };
-    } catch (err) {
-      errorHandlerFunction(err, {
-        method: "readOne",
-        response,
-        arguments: { id }
-      });
-      throw err;
-    }
-  });
-};
+    });
+  }
 
-const readAll = function readAll() {
-  return superagent.get(`${ROOT}/posts`).then(response => {
-    try {
-      return {
-        byId: postAdapters.normalizeMany(response.body)
-      };
-    } catch (err) {
-      errorHandlerFunction(err, { method: "readAll", response });
-      throw err;
-    }
-  });
-};
+  function _readAll() {
+    return superagent.get(`${ROOT}/posts`).then(response => ({
+      byId: postAdapters.normalizeMany(response.body)
+    }));
+  }
 
-const read = function read(id) {
-  return id ? readOne(id) : readAll();
-};
+  /**
+   * Updating
+   */
+  function update(entry) {
+    return ifErrorEmitGlobally(
+      () => {
+        let operation = isArray(entry) ? _updateSome : _updateOne;
+        const execute = () => operation(entry);
+        const executeAndAdaptError = addErrorAdapter(execute);
+        return executeAndAdaptError();
+      },
+      {
+        method: isArray(entry) ? "updateSome" : "updateOne",
+        entry
+      }
+    );
+  }
 
-/**
- * Updating
- */
-
-function updateSome(entries) {
-  return Promise.all(
-    entries.map(ent => {
-      let adaptedEntry = postAdapters.stringifyContentOnly(ent);
-      return superagent.patch(`${ROOT}/posts/${ent.id}`).send(adaptedEntry);
-    })
-  ).then(() => {
-    try {
-      let byId: Object = entries.reduce((acc, ent) => {
-        return _.assoc(ent.id, ent, acc);
-      }, {});
+  function _updateSome(entries) {
+    return Promise.all(
+      entries.map(ent => {
+        let adaptedEntry = postAdapters.stringifyContentOnly(ent);
+        return superagent.patch(`${ROOT}/posts/${ent.id}`).send(adaptedEntry);
+      })
+    ).then(() => {
+      let byId: Object = entries.reduce(
+        (acc, ent) => _.assoc(ent.id, ent, acc),
+        {}
+      );
 
       return {
         byId
       };
-    } catch (err) {
-      errorHandlerFunction(err, {
-        method: "updateSome",
-        arguments: { entries }
-      });
-      throw err;
-    }
-  });
-}
-
-function updateOne(entry) {
-  return superagent
-    .patch(`${ROOT}/posts/${entry.id}`)
-    .send(postAdapters.stringifyContentOnly(entry))
-    .then(() => {
-      try {
-        return {
-          byId: {
-            [entry.id]: entry
-          }
-        };
-      } catch (err) {
-        errorHandlerFunction(err, {
-          method: "updateOne",
-          arguments: { entry }
-        });
-        throw err;
-      }
     });
-}
+  }
 
-const update = function update(entry) {
-  let promise = Array.isArray(entry) ? updateSome(entry) : updateOne(entry);
-  return promise.catch(
-    _.pipe(
-      adapters.adaptErrorForReact,
-      Promise.reject.bind(Promise)
-    )
-  );
-};
+  function _updateOne(entry) {
+    return superagent
+      .patch(`${ROOT}/posts/${entry.id}`)
+      .send(postAdapters.stringifyContentOnly(entry))
+      .then(() => ({
+        byId: {
+          [entry.id]: entry
+        }
+      }));
+  }
 
-/**
- * Deleting
- */
-
-function deleteSome(ids) {
-  return Promise.all(
-    ids.map(id => {
-      return superagent.del(`${ROOT}/posts/${id}`);
-    })
-  ).then(
-    (): Object => {
-      try {
-        return {
-          ids
-        };
-      } catch (err) {
-        errorHandlerFunction(err, {
-          method: "deleteSome",
-          arguments: { ids }
-        });
-        throw err;
+  /**
+   * Deleting
+   */
+  function _delete(ids) {
+    return ifErrorEmitGlobally(
+      () => {
+        let operation = isArray(ids) ? _deleteSome : _deleteOne;
+        const execute = () => operation(ids);
+        const executeAndAdaptError = addErrorAdapter(execute);
+        return executeAndAdaptError();
+      },
+      {
+        method: isArray(ids) ? "deleteSome" : "deleteOne",
+        ids
       }
-    }
-  );
+    );
+  }
+
+  function _deleteSome(ids) {
+    return Promise.all(
+      ids.map(id => superagent.del(`${ROOT}/posts/${id}`))
+    ).then(
+      (): Object => ({
+        ids
+      })
+    );
+  }
+
+  function _deleteOne(id) {
+    return superagent.del(`${ROOT}/posts/${id}`).then(() => ({
+      id
+    }));
+  }
+
+  /**
+   * The Whole Client
+   */
+
+  const client: RestClientInstance = {
+    create,
+    read,
+    update,
+    delete: _delete
+  };
+  return client;
+  // export default client;
+
+  /**
+   * Helpers
+   */
+
+  function ifErrorEmitGlobally(possiblyUnsafeOperation, details) {
+    return new Promise((resolve, reject) => {
+      return possiblyUnsafeOperation()
+        .then(resolve)
+        .catch(reject);
+    }).catch(e => {
+      !e.error.status && errorHandler(e, details);
+      return Promise.reject(e);
+    });
+  }
+  function rejectPromise(value) {
+    return Promise.reject(value);
+  }
+  function isArray(value) {
+    return Array.isArray(value);
+  }
+  function addErrorAdapter(func) {
+    return function() {
+      return func().catch(
+        _.pipe(
+          adapters.adaptErrorForReact,
+          rejectPromise
+        )
+      );
+    };
+  }
 }
-
-function deleteOne(id) {
-  return superagent.del(`${ROOT}/posts/${id}`).then(() => {
-    try {
-      return { id };
-    } catch (err) {
-      errorHandlerFunction(err, {
-        method: "deleteOne",
-        arguments: { id }
-      });
-      throw err;
-    }
-  });
-}
-
-const _delete = function _delete(ids) {
-  return Array.isArray(ids) ? deleteSome(ids) : deleteOne(ids);
-};
-
-/**
- * The Whole Client
- */
-
-const client: RestClientInstance = {
-  create,
-  read,
-  update,
-  delete: _delete
-};
-
-export default client;

@@ -94,6 +94,12 @@ class _PostListPage extends React.Component<Props, State> {
         this.applyChanges([changes.cancelBulkUpdate]);
       }
     }
+    if (
+      this.state.selectedEntryIndexes.length === 1 &&
+      this.state.bulkUpdateSectionOpen
+    ) {
+      this.applyChanges([changes.cancelBulkUpdate]);
+    }
   }
 
   /**

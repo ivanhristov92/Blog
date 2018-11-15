@@ -5,13 +5,13 @@ import {
   selectorsFactory,
   bindSelectorsToState
 } from "redux-manager-lib/index";
-import moduleRestApi from "./rest-client-blog-post";
+import blogRestClientFactory from "./rest-client-blog-post";
 
 const MODEL_NAME = "BlogPost";
 
 const actionTypes = actionTypesFactory(MODEL_NAME);
 
-const restApi = moduleRestApi;
+const restApi = blogRestClientFactory();
 
 const actionCreators = actionCreatorsFactory(actionTypes, restApi);
 

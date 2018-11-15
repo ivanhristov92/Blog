@@ -25,7 +25,11 @@ class _Breadcrumbs extends React.Component {
 
     let links = allBreadcrumbs.map((e, i) => {
       let to = constructPath(i);
-      return <Link to={to}>{e || "home"} / </Link>;
+      return (
+        <Link key={to} to={to}>
+          {e || "home"} /{" "}
+        </Link>
+      );
     });
 
     return (

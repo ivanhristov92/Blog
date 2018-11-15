@@ -71,11 +71,21 @@ export { postAdapters };
  * Error Adapters
  */
 export function adaptErrorForReact(error: Error): AdaptedError {
-  let messages = pathOr(
-    "",
-    ["response", "body", "error", "details", "messages"],
-    error
-  );
+  let name = pathOr("", ["response", "body", "error", "name"], error);
+
+  let messages;
+  if (name === "PayloadTooLargeError") {
+    messages = {
+      "*": pathOr("", ["response", "body", "error", "message"], error)
+    };
+  } else {
+    messages = pathOr(
+      "",
+      ["response", "body", "error", "details", "messages"],
+      error
+    );
+  }
+
   return {
     error: error,
     messages
